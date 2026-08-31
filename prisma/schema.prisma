@@ -1,0 +1,151 @@
+// CHOISISTABORNE — schema Prisma
+// SQLite en développement, compatible PostgreSQL en production
+// (passer provider à "postgresql" et DATABASE_URL vers votre instance)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  passwordHash String?
+  role      String    @default("customer") // customer | admin
+  createdAt DateTime  @default(now())
+  addresses Address[]
+  orders    Order[]
+  reviews   Review[]
+  cart      Cart?
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  label      String?
+  line1      String
+  line2      String?
+  postalCode String
+  city       String
+  country    String   @default("France")
+  phone      String?
+  createdAt  DateTime @default(now())
+}
+
+model Brand {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  logo     String?
+  products Product[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  products Product[]
+}
+
+model Product {
+  id             String      @id @default(cuid())
+  slug           String      @unique
+  name           String
+  tagline        String?
+  description    String
+  price          Float
+  compareAtPrice Float?
+  powerKw        Float
+  phase          String // monophase | triphase
+  connectivity   String // none | wifi | wifi_bluetooth | wifi_4g
+  installation   String // interieur | exterieur | les_deux
+  badge          String? // "Nouveau" | "Meilleure vente" | "Intelligent"
+  featured       Boolean     @default(false)
+  stock          Int         @default(25)
+  brandId        String
+  brand          Brand       @relation(fields: [brandId], references: [id])
+  categoryId     String
+  category       Category    @relation(fields: [categoryId], references: [id])
+  images         ProductImage[]
+  reviews        Review[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  url       String
+  alt       String
+  kind      String  @default("main") // main | detail | installation | closeup
+  position  Int     @default(0)
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  rating    Int
+  title     String?
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?    @unique
+  user      User?      @relation(fields: [userId], references: [id])
+  sessionId String?    @unique
+  items     CartItem[]
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String  @id @default(cuid())
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int     @default(1)
+}
+
+model Coupon {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  percentOff    Int?
+  amountOffCent Int?
+  active        Boolean  @default(true)
+  expiresAt     DateTime?
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  status      String      @default("pending") // pending | paid | shipped | delivered | cancelled
+  totalCent   Int
+  stripeId    String?
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  order      Order   @relation(fields: [orderId], references: [id])
+  productId  String
+  product    Product @relation(fields: [productId], references: [id])
+  quantity   Int
+  unitPriceCent Int
+}
