@@ -1,7 +1,3 @@
-// CHOISISTABORNE — schema Prisma
-// SQLite en développement, compatible PostgreSQL en production
-// (passer provider à "postgresql" et DATABASE_URL vers votre instance)
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,140 +8,290 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  name      String?
+  id           String      @id
+  email        String      @unique
   passwordHash String?
-  role      String    @default("customer") // customer | admin
-  createdAt DateTime  @default(now())
+  name         String?
+  role         String      @default("CUSTOMER")
+  companyName  String?
+  siret        String?
+  vatNumber    String?
+  phone        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime
+
   addresses Address[]
+  cart      Cart?
   orders    Order[]
   reviews   Review[]
-  cart      Cart?
+
+  @@map("users")
 }
 
 model Address {
-  id         String   @id @default(cuid())
+  id         String   @id
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  label      String?
-  line1      String
-  line2      String?
+  type       String   @default("SHIPPING")
+  isDefault  Boolean  @default(false)
+  firstName  String
+  lastName   String
+  company    String?
+  street     String
+  complement String?
   postalCode String
   city       String
   country    String   @default("France")
   phone      String?
   createdAt  DateTime @default(now())
+  updatedAt  DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
 }
 
 model Brand {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  slug     String    @unique
-  logo     String?
+  id            String    @id
+  name          String    @unique
+  slug          String    @unique
+  description   String?
+  logo          String?
+  bannerImage   String?
+  website       String?
+  originCountry String?   @default("Europe")
+  isFeatured    Boolean   @default(false)
+  displayOrder  Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+
   products Product[]
+
+  @@map("brands")
 }
 
 model Category {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  slug     String    @unique
+  id            String     @id
+  name          String     @unique
+  slug          String     @unique
+  description   String?
+  image         String?
+  displayOrder  Int        @default(0)
+  parentId      String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime
+
+  parent   Category?  @relation("CategoryParent", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryParent")
   products Product[]
+
+  @@map("categories")
 }
 
 model Product {
-  id             String      @id @default(cuid())
-  slug           String      @unique
-  name           String
-  tagline        String?
-  description    String
-  price          Float
-  compareAtPrice Float?
-  powerKw        Float
-  phase          String // monophase | triphase
-  connectivity   String // none | wifi | wifi_bluetooth | wifi_4g
-  installation   String // interieur | exterieur | les_deux
-  badge          String? // "Nouveau" | "Meilleure vente" | "Intelligent"
-  featured       Boolean     @default(false)
-  stock          Int         @default(25)
-  brandId        String
-  brand          Brand       @relation(fields: [brandId], references: [id])
-  categoryId     String
-  category       Category    @relation(fields: [categoryId], references: [id])
+  id                String                   @id
+  reference         String                   @unique
+  sku               String                   @unique
+  slug              String                   @unique
+  name              String
+  brandId           String
+  categoryId        String
+  shortDescription  String?
+  description       String
+  priceHT           Float
+  priceTTC          Float
+  vatRate           Float                    @default(20.0)
+  compareAtPrice    Float?
+  stock             Int                      @default(0)
+  inStock           Boolean                  @default(true)
+  leadTimeDays      Int                      @default(2)
+  powerKw           Float
+  phaseType         String                   @default("MONO")
+  connectorType     String                   @default("T2S")
+  cableLengthMeters Float?
+  ipRating          String?                  @default("IP55")
+  ikRating          String?                  @default("IK10")
+  ocppVersion       String?                  @default("1.6J")
+  hasDynamicLoad    Boolean                  @default(false)
+  hasSolarMode      Boolean                  @default(false)
+  hasWifi           Boolean                  @default(true)
+  hasRfid           Boolean                  @default(false)
+  has4G             Boolean                  @default(false)
+  isFeatured        Boolean                  @default(false)
+  isBestSeller      Boolean                  @default(false)
+  isActive          Boolean                  @default(true)
+  isAdvenirEligible Boolean                  @default(true)
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime
+
+  brand          Brand                  @relation(fields: [brandId], references: [id])
+  category       Category               @relation(fields: [categoryId], references: [id])
   images         ProductImage[]
+  specifications ProductSpecification[]
   reviews        Review[]
   cartItems      CartItem[]
   orderItems     OrderItem[]
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+
+  @@map("products")
 }
 
 model ProductImage {
-  id        String  @id @default(cuid())
+  id        String   @id
   productId String
-  product   Product @relation(fields: [productId], references: [id])
   url       String
-  alt       String
-  kind      String  @default("main") // main | detail | installation | closeup
-  position  Int     @default(0)
+  alt       String?
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model ProductSpecification {
+  id        String   @id
+  productId String
+  group     String
+  name      String
+  value     String
+  order     Int      @default(0)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_specifications")
 }
 
 model Review {
-  id        String   @id @default(cuid())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  rating    Int
-  title     String?
-  body      String
-  createdAt DateTime @default(now())
+  id                 String   @id
+  productId          String
+  userId             String?
+  authorName         String
+  rating             Int
+  title              String?
+  comment            String
+  isVerifiedPurchase Boolean  @default(true)
+  isApproved         Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id])
+
+  @@map("reviews")
 }
 
 model Cart {
-  id        String     @id @default(cuid())
+  id        String     @id
   userId    String?    @unique
-  user      User?      @relation(fields: [userId], references: [id])
   sessionId String?    @unique
-  items     CartItem[]
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+
+  items CartItem[]
+  user  User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("carts")
 }
 
 model CartItem {
-  id        String  @id @default(cuid())
+  id        String   @id
   cartId    String
-  cart      Cart    @relation(fields: [cartId], references: [id])
   productId String
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int     @default(1)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
 }
 
 model Coupon {
-  id            String   @id @default(cuid())
-  code          String   @unique
-  percentOff    Int?
-  amountOffCent Int?
-  active        Boolean  @default(true)
-  expiresAt     DateTime?
+  id           String    @id
+  code         String    @unique
+  description  String?
+  discountType String    @default("PERCENT")
+  value        Float
+  minSpend     Float?    @default(0.0)
+  maxUses      Int?
+  usedCount    Int       @default(0)
+  isActive     Boolean   @default(true)
+  validFrom    DateTime  @default(now())
+  validUntil   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime
+
+  @@map("coupons")
 }
 
 model Order {
-  id          String      @id @default(cuid())
-  userId      String
-  user        User        @relation(fields: [userId], references: [id])
-  status      String      @default("pending") // pending | paid | shipped | delivered | cancelled
-  totalCent   Int
-  stripeId    String?
-  items       OrderItem[]
-  createdAt   DateTime    @default(now())
+  id                    String      @id
+  orderNumber           String      @unique
+  userId                String?
+  status                String      @default("PENDING")
+  paymentStatus         String      @default("UNPAID")
+  subtotalHT            Float
+  taxAmount             Float
+  shippingCost          Float       @default(0.0)
+  discountAmount        Float       @default(0.0)
+  totalTTC              Float
+  customerEmail         String
+  customerName          String
+  customerPhone         String?
+  isB2B                 Boolean     @default(false)
+  companyName           String?
+  siret                 String?
+  vatNumber             String?
+  shippingAddress       String
+  billingAddress        String
+  carrier               String?     @default("Chronopost / Geodis IRVE")
+  trackingNumber        String?
+  installationRequested Boolean     @default(false)
+  notes                 String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime
+
+  user     User?       @relation(fields: [userId], references: [id])
+  items    OrderItem[]
+  payments Payment[]
+
+  @@map("orders")
 }
 
 model OrderItem {
-  id         String  @id @default(cuid())
-  orderId    String
-  order      Order   @relation(fields: [orderId], references: [id])
-  productId  String
-  product    Product @relation(fields: [productId], references: [id])
-  quantity   Int
-  unitPriceCent Int
+  id           String  @id
+  orderId      String
+  productId    String
+  productName  String
+  productSku   String
+  unitPriceHT  Float
+  unitPriceTTC Float
+  vatRate      Float
+  quantity     Int
+  totalHT      Float
+  totalTTC     Float
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id            String   @id
+  orderId       String
+  provider      String   @default("STRIPE")
+  transactionId String?
+  amount        Float
+  currency      String   @default("EUR")
+  status        String   @default("PENDING")
+  paymentMethod String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
 }
