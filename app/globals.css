@@ -13,12 +13,8 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  *,
-  *::before,
-  *::after {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
@@ -32,22 +28,11 @@ body {
   font-family: var(--font-body);
 }
 
-::selection {
-  background: #2f6bff;
-  color: #f4f3ef;
-}
+::selection { background: #2f6bff; color: #f4f3ef; }
 
-/* Thin, quiet scrollbar to match the premium tone */
-::-webkit-scrollbar {
-  width: 10px;
-}
-::-webkit-scrollbar-track {
-  background: #0b0d10;
-}
-::-webkit-scrollbar-thumb {
-  background: #23262c;
-  border-radius: 999px;
-}
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #0b0d10; }
+::-webkit-scrollbar-thumb { background: #23262c; border-radius: 999px; }
 
 .container-content {
   max-width: 1440px;
@@ -58,17 +43,22 @@ body {
 }
 
 @media (min-width: 768px) {
-  .container-content {
-    padding-left: 3rem;
-    padding-right: 3rem;
-  }
+  .container-content { padding-left: 3rem; padding-right: 3rem; }
 }
 
-/* Prevents layout shift / flash before GSAP sets initial states */
-.gsap-hide {
-  opacity: 0;
+.gsap-hide { opacity: 0; }
+.text-balance { text-wrap: balance; }
+
+.checkout-input {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  border-radius: 0.9rem;
+  border: 1px solid #30343b;
+  background: #111419;
+  color: #f4f3ef;
+  padding: 0.85rem 1rem;
+  outline: none;
 }
 
-.text-balance {
-  text-wrap: balance;
-}
+.checkout-input:focus { border-color: #8b8f98; }
