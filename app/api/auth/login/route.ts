@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { authCookie, createSessionValue, verifyPassword } from "@/lib/auth";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 const schema = z.object({
@@ -8,32 +7,51 @@ const schema = z.object({
   password: z.string().min(1, "Mot de passe requis").max(128),
 });
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 export async function POST(request: Request) {
   try {
     const data = schema.parse(await request.json());
-    const email = data.email.toLowerCase();
-    const user = await prisma.user.findUnique({ where: { email } });
 
-    if (!user?.passwordHash || !verifyPassword(data.password, user.passwordHash)) {
-      return NextResponse.json({ error: "E-mail ou mot de passe incorrect." }, { status: 401 });
+    const { data: authData, error } = await supabase.auth.signInWithPassword({
+      email: data.email.toLowerCase(),
+      password: data.password,
+    });
+
+    if (error || !authData.user) {
+      return NextResponse.json(
+        { error: "E-mail ou mot de passe incorrect." },
+        { status: 401 }
+      );
     }
 
-    const response = NextResponse.json({
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+    return NextResponse.json({
+      user: {
+        id: authData.user.id,
+        email: authData.user.email,
+        name:
+          authData.user.user_metadata?.full_name ??
+          authData.user.user_metadata?.name ??
+          "",
+      },
+      session: authData.session,
     });
-    response.cookies.set(authCookie.name, createSessionValue(user.id), {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: authCookie.maxAge,
-    });
-    return response;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.issues[0]?.message ?? "Données invalides." }, { status: 400 });
+      return NextResponse.json(
+        { error: error.issues[0]?.message ?? "Données invalides." },
+        { status: 400 }
+      );
     }
+
     console.error("LOGIN_ERROR", error);
-    return NextResponse.json({ error: "Impossible de se connecter pour le moment." }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Impossible de se connecter pour le moment." },
+      { status: 500 }
+    );
   }
 }
