@@ -47,8 +47,7 @@ const products: SeedProduct[] = [
     slug: "wallbox-pulsar-max",
     name: "Pulsar Max",
     tagline: "Compacte, puissante, connectée.",
-    description:
-      "La Pulsar Max concentre 22 kW de puissance dans un boîtier de la taille d'une tablette. Pensée pour un usage quotidien silencieux, elle ajuste automatiquement la charge selon la capacité de votre installation électrique.",
+    description: "La Pulsar Max concentre 22 kW de puissance dans un boîtier compact. Pensée pour un usage quotidien silencieux, elle ajuste automatiquement la charge selon la capacité de votre installation électrique.",
     price: 849,
     compareAtPrice: 949,
     powerKw: 22,
@@ -64,8 +63,7 @@ const products: SeedProduct[] = [
     slug: "wallbox-copper-sb",
     name: "Copper SB",
     tagline: "L'élégance au service de la recharge.",
-    description:
-      "Habillage en cuivre brossé et finitions premium : la Copper SB est pensée pour les intérieurs soignés. Écran tactile intégré et gestion fine de la puissance jusqu'à 22 kW.",
+    description: "Habillage premium et gestion fine de la puissance jusqu'à 22 kW.",
     price: 1290,
     powerKw: 22,
     phase: "triphase",
@@ -79,8 +77,7 @@ const products: SeedProduct[] = [
     slug: "zaptec-go-2",
     name: "Go 2",
     tagline: "La référence scandinave, sans compromis.",
-    description:
-      "Étanche IP54, certifiée pour l'extérieur, la Go 2 combine robustesse nordique et pilotage intelligent via application. Répartition dynamique de la charge sur plusieurs bornes.",
+    description: "Étanche et conçue pour l'extérieur, la Go 2 combine robustesse et pilotage intelligent via application.",
     price: 799,
     powerKw: 22,
     phase: "triphase",
@@ -93,8 +90,7 @@ const products: SeedProduct[] = [
     slug: "easee-one",
     name: "One",
     tagline: "Modulaire, évolutive, sans câble fixe.",
-    description:
-      "Design modulaire permettant de faire évoluer la puissance sans changer le boîtier. Compatible Type 2 avec câble amovible pour s'adapter à tous les véhicules.",
+    description: "Design modulaire et câble amovible pour s'adapter aux différents besoins de recharge.",
     price: 899,
     powerKw: 22,
     phase: "triphase",
@@ -109,8 +105,7 @@ const products: SeedProduct[] = [
     slug: "myenergi-zappi",
     name: "Zappi",
     tagline: "Charge intelligente pilotée par le solaire.",
-    description:
-      "Conçue pour les foyers équipés de panneaux solaires, la Zappi priorise automatiquement l'énergie produite sur site avant de puiser sur le réseau.",
+    description: "La Zappi priorise automatiquement l'énergie produite sur site avant de puiser sur le réseau.",
     price: 1050,
     powerKw: 7.4,
     phase: "monophase",
@@ -124,8 +119,7 @@ const products: SeedProduct[] = [
     slug: "webasto-pure-2",
     name: "Pure II",
     tagline: "L'essentiel, parfaitement exécuté.",
-    description:
-      "Sobre et fiable, la Pure II délivre une charge stable en 7,4 kW. Idéale pour une première installation ou un usage secondaire.",
+    description: "Sobre et fiable, la Pure II délivre une charge stable en 7,4 kW.",
     price: 549,
     powerKw: 7.4,
     phase: "monophase",
@@ -138,8 +132,7 @@ const products: SeedProduct[] = [
     slug: "schneider-evlink",
     name: "EVlink Home",
     tagline: "La garantie d'un grand groupe électrique.",
-    description:
-      "Développée par un leader mondial de la distribution électrique, l'EVlink Home répond aux exigences des installations les plus normées.",
+    description: "Une borne pensée pour les installations résidentielles exigeantes.",
     price: 720,
     powerKw: 11,
     phase: "triphase",
@@ -152,8 +145,7 @@ const products: SeedProduct[] = [
     slug: "hager-witty",
     name: "Witty Start",
     tagline: "Pensée pour les installateurs.",
-    description:
-      "Montage rapide, câblage simplifié : la Witty Start réduit le temps d'installation de 30 % par rapport aux bornes traditionnelles.",
+    description: "Montage rapide et câblage simplifié pour réduire le temps d'installation.",
     price: 599,
     powerKw: 7.4,
     phase: "monophase",
@@ -166,8 +158,7 @@ const products: SeedProduct[] = [
     slug: "legrand-green-up",
     name: "Green'Up Premium",
     tagline: "Le standard français de la recharge.",
-    description:
-      "Compatible avec l'ensemble du parc automobile électrique, la Green'Up Premium s'intègre discrètement à toutes les façades.",
+    description: "Une borne qui s'intègre discrètement aux façades et installations résidentielles.",
     price: 690,
     powerKw: 11,
     phase: "triphase",
@@ -179,9 +170,8 @@ const products: SeedProduct[] = [
   {
     slug: "delta-ac-mini",
     name: "AC Mini",
-    tagline: "Le format le plus compact du marché.",
-    description:
-      "À peine plus grande qu'une boîte aux lettres, l'AC Mini se fond dans n'importe quel garage sans jamais sacrifier la puissance de charge.",
+    tagline: "Le format compact.",
+    description: "Une borne compacte pour garage et stationnement résidentiel.",
     price: 469,
     powerKw: 7.4,
     phase: "monophase",
@@ -194,8 +184,7 @@ const products: SeedProduct[] = [
     slug: "abb-terra-ac",
     name: "Terra AC",
     tagline: "L'excellence industrielle, chez vous.",
-    description:
-      "Issue du savoir-faire d'ABB dans les infrastructures de recharge rapide, la Terra AC en version résidentielle offre une fiabilité de niveau professionnel.",
+    description: "Une solution résidentielle issue du savoir-faire industriel d'ABB.",
     price: 950,
     powerKw: 22,
     phase: "triphase",
@@ -207,9 +196,8 @@ const products: SeedProduct[] = [
   {
     slug: "circontrol-wallbox",
     name: "eNext Wallbox",
-    tagline: "Simplicité méditerranéenne.",
-    description:
-      "Une borne robuste et directe, sans fonctionnalités superflues, pour les foyers qui veulent avant tout une charge fiable au quotidien.",
+    tagline: "Simplicité et robustesse.",
+    description: "Une borne robuste et directe pour une charge fiable au quotidien.",
     price: 529,
     powerKw: 7.4,
     phase: "monophase",
@@ -222,8 +210,7 @@ const products: SeedProduct[] = [
     slug: "keba-p30",
     name: "P30 x-series",
     tagline: "L'ingénierie autrichienne à son sommet.",
-    description:
-      "Reconnue dans toute l'Europe pour sa fiabilité en flotte, la P30 x-series équipe aussi bien les particuliers exigeants que les parkings d'entreprise.",
+    description: "Une borne conçue pour les particuliers exigeants et les parkings d'entreprise.",
     price: 1190,
     powerKw: 22,
     phase: "triphase",
@@ -236,9 +223,8 @@ const products: SeedProduct[] = [
   {
     slug: "chargepoint-home-flex",
     name: "Home Flex",
-    tagline: "S'adapte à votre installation, pas l'inverse.",
-    description:
-      "Puissance réglable de 16 à 50 ampères directement depuis l'application : la Home Flex s'ajuste à votre tableau électrique existant.",
+    tagline: "S'adapte à votre installation.",
+    description: "Une puissance réglable pour s'adapter à votre tableau électrique existant.",
     price: 749,
     powerKw: 11,
     phase: "monophase",
@@ -250,9 +236,8 @@ const products: SeedProduct[] = [
   {
     slug: "juicebox-40",
     name: "JuiceBox 40",
-    tagline: "Un classique outre-Atlantique, verifié en Europe.",
-    description:
-      "Best-seller nord-américain adapté aux normes européennes, la JuiceBox 40 combine simplicité d'usage et pilotage à distance.",
+    tagline: "Un classique outre-Atlantique, adapté à l'Europe.",
+    description: "Une borne simple à utiliser avec pilotage à distance.",
     price: 639,
     powerKw: 7.4,
     phase: "monophase",
@@ -265,11 +250,14 @@ const products: SeedProduct[] = [
 
 async function main() {
   console.log("Seed — nettoyage des tables...");
+
+  await prisma.payment.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
   await prisma.cartItem.deleteMany();
   await prisma.cart.deleteMany();
   await prisma.review.deleteMany();
+  await prisma.productSpecification.deleteMany();
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
   await prisma.brand.deleteMany();
@@ -277,40 +265,107 @@ async function main() {
   await prisma.coupon.deleteMany();
 
   console.log("Seed — marques et catégories...");
+
   for (const b of brands) {
-    await prisma.brand.create({ data: b });
+    await prisma.brand.create({
+      data: {
+        id: crypto.randomUUID(),
+        name: b.name,
+        slug: b.slug,
+        updatedAt: new Date(),
+      },
+    });
   }
+
   for (const c of categories) {
-    await prisma.category.create({ data: c });
+    await prisma.category.create({
+      data: {
+        id: crypto.randomUUID(),
+        name: c.name,
+        slug: c.slug,
+        updatedAt: new Date(),
+      },
+    });
   }
 
   console.log("Seed — produits...");
+
   for (const p of products) {
-    const brand = await prisma.brand.findUniqueOrThrow({ where: { slug: p.brand } });
-    const category = await prisma.category.findUniqueOrThrow({ where: { slug: p.category } });
+    const brand = await prisma.brand.findUniqueOrThrow({
+      where: { slug: p.brand },
+    });
+    const category = await prisma.category.findUniqueOrThrow({
+      where: { slug: p.category },
+    });
+
+    const productId = crypto.randomUUID();
 
     await prisma.product.create({
       data: {
+        id: productId,
+        reference: p.slug.toUpperCase().replace(/-/g, "_"),
+        sku: `CT-${p.slug.toUpperCase().replace(/-/g, "-")}`,
         slug: p.slug,
         name: p.name,
-        tagline: p.tagline,
-        description: p.description,
-        price: p.price,
-        compareAtPrice: p.compareAtPrice,
-        powerKw: p.powerKw,
-        phase: p.phase,
-        connectivity: p.connectivity,
-        installation: p.installation,
-        badge: p.badge,
-        featured: p.featured ?? false,
         brandId: brand.id,
         categoryId: category.id,
+        shortDescription: p.tagline,
+        description: p.description,
+        priceHT: Number((p.price / 1.2).toFixed(2)),
+        priceTTC: p.price,
+        vatRate: 20,
+        compareAtPrice: p.compareAtPrice ?? null,
+        stock: 25,
+        inStock: true,
+        leadTimeDays: 2,
+        powerKw: p.powerKw,
+        phaseType: p.phase === "monophase" ? "MONO" : "TRI",
+        connectorType: "T2S",
+        hasDynamicLoad: false,
+        hasSolarMode: p.connectivity !== "none" && p.slug.includes("zappi"),
+        hasWifi: p.connectivity === "wifi" || p.connectivity === "wifi_bluetooth" || p.connectivity === "wifi_4g",
+        hasRfid: false,
+        has4G: p.connectivity === "wifi_4g",
+        isFeatured: p.featured ?? false,
+        isBestSeller: p.badge === "Meilleure vente",
+        isActive: true,
+        isAdvenirEligible: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         images: {
           create: [
-            { url: `/images/products/${p.slug}-main.webp`, alt: `${p.name} — vue principale`, kind: "main", position: 0 },
-            { url: `/images/products/${p.slug}-detail.webp`, alt: `${p.name} — détail`, kind: "detail", position: 1 },
-            { url: `/images/products/${p.slug}-installation.webp`, alt: `${p.name} — installée`, kind: "installation", position: 2 },
-            { url: `/images/products/${p.slug}-closeup.webp`, alt: `${p.name} — gros plan`, kind: "closeup", position: 3 },
+            {
+              id: crypto.randomUUID(),
+              url: `/images/products/${p.slug}-main.webp`,
+              alt: `${p.name} — vue principale`,
+              isPrimary: true,
+              order: 0,
+              createdAt: new Date(),
+            },
+            {
+              id: crypto.randomUUID(),
+              url: `/images/products/${p.slug}-detail.webp`,
+              alt: `${p.name} — détail`,
+              isPrimary: false,
+              order: 1,
+              createdAt: new Date(),
+            },
+            {
+              id: crypto.randomUUID(),
+              url: `/images/products/${p.slug}-installation.webp`,
+              alt: `${p.name} — installée`,
+              isPrimary: false,
+              order: 2,
+              createdAt: new Date(),
+            },
+            {
+              id: crypto.randomUUID(),
+              url: `/images/products/${p.slug}-closeup.webp`,
+              alt: `${p.name} — gros plan`,
+              isPrimary: false,
+              order: 3,
+              createdAt: new Date(),
+            },
           ],
         },
       },
@@ -318,15 +373,26 @@ async function main() {
   }
 
   await prisma.coupon.create({
-    data: { code: "BIENVENUE10", percentOff: 10, active: true },
+    data: {
+      id: crypto.randomUUID(),
+      code: "BIENVENUE10",
+      description: "10% de réduction de bienvenue",
+      discountType: "PERCENT",
+      value: 10,
+      minSpend: 0,
+      isActive: true,
+      validFrom: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
   });
 
   console.log(`Seed terminé — ${products.length} produits créés.`);
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
+  .catch((error) => {
+    console.error(error);
     process.exit(1);
   })
   .finally(async () => {
