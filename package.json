@@ -12,7 +12,9 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^5.20.0",
+    "@prisma/client": "^5.22.0",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.112.4",
     "clsx": "^2.1.1",
     "gsap": "^3.12.5",
     "lucide-react": "^0.446.0",
