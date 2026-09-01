@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Minus, Plus, X } from "lucide-react";
 import { useCartStore, cartTotal } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/types";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default function PanierPage() {
   const lines = useCartStore((s) => s.lines);
@@ -35,35 +35,15 @@ export default function PanierPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="text-xs uppercase tracking-wide text-fog">{line.brand}</p>
-                        <Link href={`/produits/${line.slug}`} className="font-display text-lg text-paper hover:underline">
-                          {line.name}
-                        </Link>
+                        <Link href={`/produits/${line.slug}`} className="font-display text-lg text-paper hover:underline">{line.name}</Link>
                       </div>
-                      <button
-                        onClick={() => removeItem(line.productId)}
-                        aria-label="Retirer l'article"
-                        className="text-fog hover:text-paper"
-                      >
-                        <X size={18} />
-                      </button>
+                      <button onClick={() => removeItem(line.productId)} aria-label="Retirer l'article" className="text-fog hover:text-paper"><X size={18} /></button>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3 rounded-full border border-line px-3 py-1.5">
-                        <button
-                          onClick={() => setQuantity(line.productId, line.quantity - 1)}
-                          className="text-paper/70 hover:text-paper"
-                          aria-label="Diminuer la quantité"
-                        >
-                          <Minus size={14} />
-                        </button>
+                        <button onClick={() => setQuantity(line.productId, line.quantity - 1)} className="text-paper/70 hover:text-paper" aria-label="Diminuer la quantité"><Minus size={14} /></button>
                         <span className="w-4 text-center text-sm">{line.quantity}</span>
-                        <button
-                          onClick={() => setQuantity(line.productId, line.quantity + 1)}
-                          className="text-paper/70 hover:text-paper"
-                          aria-label="Augmenter la quantité"
-                        >
-                          <Plus size={14} />
-                        </button>
+                        <button onClick={() => setQuantity(line.productId, line.quantity + 1)} className="text-paper/70 hover:text-paper" aria-label="Augmenter la quantité"><Plus size={14} /></button>
                       </div>
                       <p className="text-paper">{formatPrice(line.price * line.quantity)}</p>
                     </div>
@@ -74,20 +54,11 @@ export default function PanierPage() {
 
             <div className="h-fit rounded-3xl border border-line p-8">
               <h2 className="mb-6 font-display text-xl text-paper">Récapitulatif</h2>
-              <div className="mb-2 flex justify-between text-sm text-paper/70">
-                <span>Sous-total</span>
-                <span>{formatPrice(total)}</span>
-              </div>
-              <div className="mb-6 flex justify-between text-sm text-paper/70">
-                <span>Installation</span>
-                <span>Sur devis</span>
-              </div>
-              <div className="mb-8 flex justify-between border-t border-line pt-4 font-display text-lg text-paper">
-                <span>Total</span>
-                <span>{formatPrice(total)}</span>
-              </div>
-              <Button className="w-full" size="lg">Passer au paiement</Button>
-              <p className="mt-4 text-center text-xs text-fog">Paiement sécurisé via Stripe (mode test)</p>
+              <div className="mb-2 flex justify-between text-sm text-paper/70"><span>Sous-total</span><span>{formatPrice(total)}</span></div>
+              <div className="mb-6 flex justify-between text-sm text-paper/70"><span>Installation</span><span>Sur devis</span></div>
+              <div className="mb-8 flex justify-between border-t border-line pt-4 font-display text-lg text-paper"><span>Total</span><span>{formatPrice(total)}</span></div>
+              <ButtonLink href="/commande" className="w-full" size="lg">Passer au paiement</ButtonLink>
+              <p className="mt-4 text-center text-xs text-fog">Paiement sécurisé via Stripe</p>
             </div>
           </div>
         )}
