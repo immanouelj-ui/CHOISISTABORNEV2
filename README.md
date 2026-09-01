@@ -8,6 +8,7 @@ Site e-commerce premium et immersif pour bornes de recharge électrique — Next
 
 ```bash
 npm install
+npx prisma generate
 npx prisma db push
 npm run db:seed
 npm run dev
@@ -15,60 +16,76 @@ npm run dev
 
 Le site est accessible sur **http://localhost:3000**.
 
-> Note réseau : `npm install` déclenche `prisma generate`, qui télécharge le moteur Prisma depuis `binaries.prisma.sh`. Cela nécessite un accès internet sortant normal (aucune configuration particulière n'est requise sur votre machine).
+## Fonctionnalités
 
-## Ce qui est implémenté
+- **Accueil immersif** : Hero plein écran, animations GSAP, configurateur, galerie et comparateur.
+- **Catalogue** (`/produits`) : recherche, filtres, tri et fiches produit.
+- **Simulateur** (`/simulateur`) : recommandation de borne.
+- **Panier** (`/panier`) : panier Zustand persistant et modification des quantités.
+- **Checkout client** (`/commande`) : coordonnées, adresse de livraison/facturation et validation du panier côté serveur.
+- **Paiement Stripe Checkout** : création d'une commande en base avant redirection Stripe, prix recalculés depuis PostgreSQL et contrôle du stock côté serveur.
+- **Webhook Stripe** (`/api/stripe/webhook`) : confirmation du paiement, passage de la commande à `PAID`, mise à jour du paiement et décrément du stock de manière transactionnelle et idempotente.
+- **Confirmation** (`/paiement/succes`) et **annulation** (`/paiement/annule`) du paiement.
+- **Prisma / Supabase PostgreSQL** : utilisateurs, produits, panier, commandes, lignes de commande, paiements, avis, coupons et adresses.
+- **SEO / accessibilité** : métadonnées, sitemap, robots, JSON-LD produit et respect de `prefers-reduced-motion`.
 
-- **Accueil immersif** : Hero plein écran avec timeline GSAP au chargement, section de zoom scrubbed au scroll, configurateur interactif ("Quelle borne est faite pour vous ?"), section pinnée (7,4 kW → 22 kW → Connectée → Intelligente), galerie de détails avec animations décalées, produits en scroll horizontal (`containerAnimation`-style pin), comparateur.
-- **Catalogue** (`/produits`) : recherche, filtres (catégorie, marque, puissance, connectivité), tri, skeletons de chargement, cartes produit avec hover GSAP et ajout rapide au panier.
-- **Fiche produit** (`/produits/[slug]`) : reveal d'image façon "product reveal" (scale 1.4 → 1), galerie narrative en scroll (image → gros plan → caractéristiques → installation), JSON-LD Schema.org `Product`, produits liés.
-- **Simulateur** (`/simulateur`) : parcours en 5 étapes avec transitions GSAP et moteur de recommandation scoré sur les 15 produits.
-- **Panier** (`/panier` + `CartDrawer`) : store Zustand persistant, tiroir animé (slide + stagger), page panier complète.
-- **Header animé** : compaction au scroll (GSAP), menu plein écran sur mobile.
-- **Footer graphique** avec reveal au scroll.
-- **SEO** : métadonnées par page, Open Graph, Twitter cards, `sitemap.ts` dynamique, `robots.ts`, JSON-LD produit.
-- **Prisma** : schéma complet (User, Product, Brand, Category, Order, Cart, Review, Coupon, Address...), seed avec 15 produits réels (Wallbox, Zaptec, Easee, myenergi, Webasto, Schneider Electric, Hager, Legrand, Delta, ABB, Circontrol, KEBA, ChargePoint, JuiceBox), chacun avec 4 images.
-- **Accessibilité / performance** : `prefers-reduced-motion` respecté partout (chaque animation GSAP a une branche réduite), animations sur `transform`/`opacity` uniquement, images `next/image` avec `sizes` définis.
+## Stripe — configuration
+
+Les clés Stripe ne doivent **jamais** être commitées dans GitHub. Copiez `.env.example` vers `.env.local` et renseignez :
+
+```env
+DATABASE_URL="postgresql://..."
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+```
+
+En production, ajoutez les mêmes variables dans l'hébergeur (par exemple Vercel) plutôt que dans le dépôt Git.
+
+### Webhook Stripe
+
+Configurez dans le Dashboard Stripe un endpoint :
+
+```text
+https://VOTRE-DOMAINE/api/stripe/webhook
+```
+
+Événements nécessaires :
+
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.expired`
+- `payment_intent.payment_failed`
+
+Copiez la signature du webhook (`whsec_...`) dans `STRIPE_WEBHOOK_SECRET`.
+
+## Production / Supabase
+
+Le schéma Prisma utilise PostgreSQL et les tables existantes sont mappées avec `@@map` (`users`, `products`, `orders`, etc.). Après modification du schéma :
+
+```bash
+npx prisma generate
+npx prisma db push
+npm run db:seed
+npm run build
+```
 
 ## Images
 
-Toutes les images de `/public/images` sont des **visuels de substitution générés proceduralement** (dégradés + glyphes abstraits de borne/voiture/maison dans la palette de la marque), pour que le site soit navigable immédiatement sans dépendance à un service externe.
-
-Remplacez-les par de vraies photos en gardant exactement les mêmes noms de fichiers :
-
-```
-public/images/hero/hero-main.webp, hero-closeup.webp, zoom-1..4.webp
-public/images/gallery/pinned-1..5.webp, detail-screen.webp, detail-connector.webp, detail-led.webp, detail-texture.webp, detail-install.webp
-public/images/misc/configurator-1..3.webp, og-cover.webp
-public/images/products/{slug}-main.webp, {slug}-detail.webp, {slug}-installation.webp, {slug}-closeup.webp
-```
-
-Le script qui les a générées est conservé dans `scripts/gen_images.py` (nécessite `pillow` et `numpy`) si vous voulez régénérer ou ajuster la palette.
-
-## Production / PostgreSQL
-
-En développement, la base est SQLite (`prisma/schema.prisma`, `DATABASE_URL="file:./dev.db"`). Pour la production :
-
-1. Dans `prisma/schema.prisma`, changez `provider = "sqlite"` en `provider = "postgresql"`.
-2. Définissez `DATABASE_URL` vers votre instance PostgreSQL dans `.env`.
-3. `npx prisma db push` (ou `migrate deploy`), puis `npm run db:seed`.
-
-## Ce qui reste à brancher pour une mise en production complète
-
-Le brief d'origine demandait aussi un compte client avec authentification, un checkout Stripe fonctionnel et une interface d'administration. Le socle est prêt pour ça (modèles `User`, `Order`, `OrderItem`, page `/compte` en placeholder, panier déjà persistant), mais l'authentification, l'intégration Stripe et le back-office admin n'ont pas été implémentés dans cette itération — ce sont les prochaines briques logiques à ajouter.
+Les images de `/public/images` sont des visuels de substitution. Remplacez-les par les photos finales en conservant les noms attendus par les fiches produit.
 
 ## Structure
 
-```
-app/                    routes (App Router)
-components/animations/  hook GSAP réutilisable (contexte + cleanup + reduced motion)
-components/layout/      header, menu mobile, footer, tiroir panier
-components/home/        sections de la page d'accueil
-components/products/    carte produit, grille, filtres, galerie, reveal
-components/simulator/   simulateur en 5 étapes
-components/ui/          bouton partagé
-lib/                    accès Prisma, store panier Zustand, types partagés
+```text
+app/                    routes App Router + API checkout/webhook
+components/animations/  hooks GSAP
+components/layout/      header, menu mobile, footer, panier
+components/home/        sections accueil
+components/products/    catalogue et fiches produit
+components/simulator/   simulateur
+components/ui/          composants partagés
+lib/                    Prisma, Stripe, store panier, types
 prisma/                 schema + seed
-public/images/          visuels (placeholders génératifs)
-scripts/                générateur d'images de substitution
+public/images/          visuels
+scripts/                outils images
 ```
