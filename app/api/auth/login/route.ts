@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   try {
     const data = schema.parse(await request.json());
     const cookieStore = cookies();
-    const response = NextResponse.json({ ok: true });
+    const cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }> = [];
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,10 +23,8 @@ export async function POST(request: Request) {
       {
         cookies: {
           getAll: () => cookieStore.getAll(),
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
-            });
+          setAll: (cookies) => {
+            cookiesToSet.push(...cookies);
           },
         },
       }
@@ -44,28 +42,23 @@ export async function POST(request: Request) {
       );
     }
 
-    response.headers.set("Content-Type", "application/json");
-    response.headers.set(
-      "Cache-Control",
-      "private, no-store, max-age=0"
-    );
-    return new NextResponse(
-      JSON.stringify({
-        user: {
-          id: authData.user.id,
-          email: authData.user.email,
-          name:
-            authData.user.user_metadata?.full_name ??
-            authData.user.user_metadata?.name ??
-            "",
-        },
-        session: authData.session,
-      }),
-      {
-        status: 200,
-        headers: response.headers,
-      }
-    );
+    const response = NextResponse.json({
+      user: {
+        id: authData.user.id,
+        email: authData.user.email,
+        name:
+          authData.user.user_metadata?.full_name ??
+          authData.user.user_metadata?.name ??
+          "",
+      },
+      session: authData.session,
+    });
+
+    cookiesToSet.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, options as any);
+    });
+    response.headers.set("Cache-Control", "private, no-store, max-age=0");
+    return response;
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
