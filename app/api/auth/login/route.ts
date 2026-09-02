@@ -45,19 +45,27 @@ export async function POST(request: Request) {
     }
 
     response.headers.set("Content-Type", "application/json");
-    response.body;
-    const body = JSON.stringify({
-      user: {
-        id: authData.user.id,
-        email: authData.user.email,
-        name:
-          authData.user.user_metadata?.full_name ??
-          authData.user.user_metadata?.name ??
-          "",
-      },
-      session: authData.session,
-    });
-    return new NextResponse(body, { status: 200, headers: response.headers });
+    response.headers.set(
+      "Cache-Control",
+      "private, no-store, max-age=0"
+    );
+    return new NextResponse(
+      JSON.stringify({
+        user: {
+          id: authData.user.id,
+          email: authData.user.email,
+          name:
+            authData.user.user_metadata?.full_name ??
+            authData.user.user_metadata?.name ??
+            "",
+        },
+        session: authData.session,
+      }),
+      {
+        status: 200,
+        headers: response.headers,
+      }
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
