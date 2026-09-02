@@ -3,13 +3,14 @@ import { notFound } from "next/navigation";
 import ProductReveal from "@/components/products/ProductReveal";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductGrid from "@/components/products/ProductGrid";
-import { getAllProducts, getProductBySlug, getRelatedProducts } from "@/lib/products";
+import { getProductBySlug, getRelatedProducts } from "@/lib/products";
 import { formatPrice } from "@/lib/types";
 
-export async function generateStaticParams() {
-  const products = await getAllProducts();
-  return products.map((p) => ({ slug: p.slug }));
-}
+// Les fiches produits utilisent Prisma/Supabase à la demande.
+// On évite generateStaticParams() afin que Vercel ne lance pas une requête
+// PostgreSQL pour chaque produit pendant le build.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const product = await getProductBySlug(params.slug);
