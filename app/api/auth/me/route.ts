@@ -6,6 +6,10 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+// Compte administrateur principal.
+// La vérification est faite côté serveur à partir de l'e-mail de la session Supabase.
+const ADMIN_EMAIL = "immanouelj@gmail.com";
+
 export async function GET() {
   try {
     const cookieStore = cookies();
@@ -39,6 +43,9 @@ export async function GET() {
       return NextResponse.json({ user: null });
     }
 
+    const email = (supabaseUser.email ?? "").trim().toLowerCase();
+    const isAdminEmail = email === ADMIN_EMAIL;
+
     const user = await prisma.user.findUnique({
       where: { id: supabaseUser.id },
       select: {
@@ -49,16 +56,22 @@ export async function GET() {
       },
     });
 
+    // L'e-mail administrateur reste ADMIN même si la ligne Prisma n'existe
+    // pas encore ou si son rôle n'a pas encore été synchronisé.
+    const role = isAdminEmail ? "ADMIN" : user?.role ?? "CUSTOMER";
+
     return NextResponse.json({
-      user: user ?? {
-        id: supabaseUser.id,
-        name:
-          supabaseUser.user_metadata?.full_name ??
-          supabaseUser.user_metadata?.name ??
-          "",
-        email: supabaseUser.email ?? "",
-        role: "CUSTOMER",
-      },
+      user: user
+        ? { ...user, role }
+        : {
+            id: supabaseUser.id,
+            name:
+              supabaseUser.user_metadata?.full_name ??
+              supabaseUser.user_metadata?.name ??
+              "",
+            email: supabaseUser.email ?? "",
+            role,
+          },
     });
   } catch (error) {
     console.error("ME_ERROR", error);
