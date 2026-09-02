@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const ADMIN_EMAIL = "immanouelj@gmail.com";
 
@@ -27,33 +28,37 @@ async function getAdmin() {
   if (!user) redirect("/compte");
 
   const email = (user.email ?? "").trim().toLowerCase();
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { name: true, email: true, role: true },
-  });
+  if (email !== ADMIN_EMAIL) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true, name: true, email: true },
+    });
 
-  // L'adresse Google principale est autorisée administrateur côté serveur.
-  // Cela fonctionne même si le compte vient d'être créé via Google et que
-  // sa ligne Prisma n'existe pas encore.
-  const isAdmin = dbUser?.role === "ADMIN" || email === ADMIN_EMAIL;
+    if (dbUser?.role !== "ADMIN") redirect("/");
 
-  if (!isAdmin) redirect("/");
+    return {
+      name: dbUser?.name ?? user.user_metadata?.full_name ?? user.user_metadata?.name ?? "",
+      email: dbUser?.email ?? user.email ?? "",
+      role: "ADMIN",
+    };
+  }
 
   return {
-    name: dbUser?.name ?? user.user_metadata?.full_name ?? user.user_metadata?.name ?? "",
-    email: dbUser?.email ?? user.email ?? "",
+    name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? "",
+    email: user.email ?? ADMIN_EMAIL,
     role: "ADMIN",
   };
 }
 
 export default async function AdminPage() {
   const admin = await getAdmin();
-  const [users, orders, products, paidOrders] = await Promise.all([
-    prisma.user.count(),
-    prisma.order.count(),
-    prisma.product.count({ where: { isActive: true } }),
-    prisma.order.count({ where: { paymentStatus: "PAID" } }),
-  ]);
+
+  // Requêtes séquentielles pour éviter d'ouvrir plusieurs connexions Prisma
+  // simultanément sur le pool Supabase/Vercel.
+  const users = await prisma.user.count();
+  const orders = await prisma.order.count();
+  const paidOrders = await prisma.order.count({ where: { paymentStatus: "PAID" } });
+  const products = await prisma.product.count({ where: { isActive: true } });
 
   return (
     <main className="min-h-screen bg-ink px-6 pb-24 pt-32 text-paper">
