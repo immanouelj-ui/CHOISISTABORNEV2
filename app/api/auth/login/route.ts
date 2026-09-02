@@ -11,11 +11,13 @@ const schema = z.object({
   password: z.string().min(1, "Mot de passe requis").max(128),
 });
 
+type CookieToSet = { name: string; value: string; options?: any };
+
 export async function POST(request: Request) {
   try {
     const data = schema.parse(await request.json());
     const cookieStore = cookies();
-    const cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }> = [];
+    const cookiesToSet: CookieToSet[] = [];
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,9 +25,7 @@ export async function POST(request: Request) {
       {
         cookies: {
           getAll: () => cookieStore.getAll(),
-          setAll: (cookies) => {
-            cookiesToSet.push(...cookies);
-          },
+          setAll: (cookies) => cookiesToSet.push(...cookies),
         },
       }
     );
@@ -36,40 +36,26 @@ export async function POST(request: Request) {
     });
 
     if (error || !authData.user) {
-      return NextResponse.json(
-        { error: "E-mail ou mot de passe incorrect." },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "E-mail ou mot de passe incorrect." }, { status: 401 });
     }
 
     const response = NextResponse.json({
       user: {
         id: authData.user.id,
         email: authData.user.email,
-        name:
-          authData.user.user_metadata?.full_name ??
-          authData.user.user_metadata?.name ??
-          "",
+        name: authData.user.user_metadata?.full_name ?? authData.user.user_metadata?.name ?? "",
       },
       session: authData.session,
     });
 
-    cookiesToSet.forEach(({ name, value, options }) => {
-      response.cookies.set(name, value, options as any);
-    });
+    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
     return response;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: error.issues[0]?.message ?? "Données invalides." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.issues[0]?.message ?? "Données invalides." }, { status: 400 });
     }
     console.error("LOGIN_ERROR", error);
-    return NextResponse.json(
-      { error: "Impossible de se connecter pour le moment." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Impossible de se connecter pour le moment." }, { status: 500 });
   }
 }
