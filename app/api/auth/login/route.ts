@@ -11,7 +11,11 @@ const schema = z.object({
   password: z.string().min(1, "Mot de passe requis").max(128),
 });
 
-type CookieToSet = { name: string; value: string; options?: any };
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: Parameters<NextResponse["cookies"]["set"]>[2];
+};
 
 export async function POST(request: Request) {
   try {
@@ -25,7 +29,9 @@ export async function POST(request: Request) {
       {
         cookies: {
           getAll: () => cookieStore.getAll(),
-          setAll: (cookies) => cookiesToSet.push(...cookies),
+          setAll: (cookiesToSetFromSupabase) => {
+            cookiesToSet.push(...cookiesToSetFromSupabase);
+          },
         },
       }
     );
@@ -36,26 +42,40 @@ export async function POST(request: Request) {
     });
 
     if (error || !authData.user) {
-      return NextResponse.json({ error: "E-mail ou mot de passe incorrect." }, { status: 401 });
+      return NextResponse.json(
+        { error: "E-mail ou mot de passe incorrect." },
+        { status: 401 }
+      );
     }
 
     const response = NextResponse.json({
       user: {
         id: authData.user.id,
         email: authData.user.email,
-        name: authData.user.user_metadata?.full_name ?? authData.user.user_metadata?.name ?? "",
+        name:
+          authData.user.user_metadata?.full_name ??
+          authData.user.user_metadata?.name ??
+          "",
       },
       session: authData.session,
     });
 
-    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+    cookiesToSet.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, options);
+    });
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
     return response;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.issues[0]?.message ?? "Données invalides." }, { status: 400 });
+      return NextResponse.json(
+        { error: error.issues[0]?.message ?? "Données invalides." },
+        { status: 400 }
+      );
     }
     console.error("LOGIN_ERROR", error);
-    return NextResponse.json({ error: "Impossible de se connecter pour le moment." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Impossible de se connecter pour le moment." },
+      { status: 500 }
+    );
   }
 }
