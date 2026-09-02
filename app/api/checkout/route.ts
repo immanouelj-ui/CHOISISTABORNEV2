@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { createStripeCheckoutSession } from "@/lib/stripe";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -16,7 +19,7 @@ export async function POST(request: Request) {
     const phone = clean(body.phone) || null;
     const shippingAddress = clean(body.shippingAddress);
     const billingAddress = clean(body.billingAddress) || shippingAddress;
-    const userId = clean(body.userId) || null;
+    const requestedUserId = clean(body.userId) || null;
     const items = Array.isArray(body.items) ? body.items : [];
 
     if (!email || !email.includes("@")) {
@@ -26,6 +29,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Informations client ou panier incomplets." }, { status: 400 });
     }
 
+    let authenticatedUserId: string | null = null;
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => cookieStore.getAll(),
+          setAll: () => undefined,
+        },
+      }
+    );
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    authenticatedUserId = authUser?.id ?? null;
+
+    if (requestedUserId && requestedUserId !== authenticatedUserId) {
+      return NextResponse.json({ error: "Utilisateur non autorisé." }, { status: 403 });
+    }
+    const userId = authenticatedUserId;
+
     const requested = new Map<string, number>();
     for (const item of items) {
       const productId = clean(item?.productId);
@@ -33,7 +56,11 @@ export async function POST(request: Request) {
       if (!productId || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
         return NextResponse.json({ error: "Panier invalide." }, { status: 400 });
       }
-      requested.set(productId, (requested.get(productId) || 0) + quantity);
+      const totalQuantity = (requested.get(productId) || 0) + quantity;
+      if (totalQuantity > 99) {
+        return NextResponse.json({ error: "Quantité maximale dépassée." }, { status: 400 });
+      }
+      requested.set(productId, totalQuantity);
     }
 
     const products = await prisma.product.findMany({
@@ -47,7 +74,7 @@ export async function POST(request: Request) {
 
     const orderItems = products.map((product) => {
       const quantity = requested.get(product.id)!;
-      if (product.stock < quantity || !product.inStock) {
+      if (!product.inStock || product.stock < quantity) {
         throw new Error(`STOCK:${product.name}`);
       }
       return {
@@ -65,9 +92,9 @@ export async function POST(request: Request) {
       };
     });
 
-    const subtotalTTC = orderItems.reduce((sum, item) => sum + item.totalTTC, 0);
-    const subtotalHT = orderItems.reduce((sum, item) => sum + item.totalHT, 0);
-    const taxAmount = subtotalTTC - subtotalHT;
+    const subtotalTTC = Number(orderItems.reduce((sum, item) => sum + item.totalTTC, 0).toFixed(2));
+    const subtotalHT = Number(orderItems.reduce((sum, item) => sum + item.totalHT, 0).toFixed(2));
+    const taxAmount = Number((subtotalTTC - subtotalHT).toFixed(2));
     const orderNumber = `CT-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const orderId = crypto.randomUUID();
     const now = new Date();
