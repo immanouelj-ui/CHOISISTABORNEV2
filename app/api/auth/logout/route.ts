@@ -5,7 +5,11 @@ import { cookies } from "next/headers";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-type CookieToSet = { name: string; value: string; options?: any };
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: Parameters<NextResponse["cookies"]["set"]>[2];
+};
 
 export async function POST() {
   const cookieStore = cookies();
@@ -18,7 +22,9 @@ export async function POST() {
       {
         cookies: {
           getAll: () => cookieStore.getAll(),
-          setAll: (cookies) => cookiesToSet.push(...cookies),
+          setAll: (cookiesToSetFromSupabase) => {
+            cookiesToSet.push(...cookiesToSetFromSupabase);
+          },
         },
       }
     );
@@ -26,11 +32,16 @@ export async function POST() {
     await supabase.auth.signOut();
 
     const response = NextResponse.json({ ok: true });
-    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+    cookiesToSet.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, options);
+    });
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
     return response;
   } catch (error) {
     console.error("LOGOUT_ERROR", error);
-    return NextResponse.json({ error: "Impossible de se déconnecter." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Impossible de se déconnecter." },
+      { status: 500 }
+    );
   }
 }
