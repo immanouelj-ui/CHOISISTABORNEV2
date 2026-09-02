@@ -3,6 +3,11 @@ import { getAllProducts } from "@/lib/products";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+// Le sitemap lit Prisma/Supabase : il doit être généré à la demande,
+// pas pendant le build Vercel.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await getAllProducts();
 
