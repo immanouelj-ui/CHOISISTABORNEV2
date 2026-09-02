@@ -13,11 +13,13 @@ const schema = z.object({
   password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères").max(128),
 });
 
+type CookieToSet = { name: string; value: string; options?: any };
+
 export async function POST(request: Request) {
   try {
     const data = schema.parse(await request.json());
     const cookieStore = cookies();
-    const cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }> = [];
+    const cookiesToSet: CookieToSet[] = [];
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
       session: authData.session,
       emailConfirmationRequired: !authData.session,
     });
-    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options as any));
+    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
     return response;
   } catch (error) {
