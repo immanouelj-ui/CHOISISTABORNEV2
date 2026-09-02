@@ -8,6 +8,11 @@ import Comparison from "@/components/home/Comparison";
 import { getAllProducts, getFeaturedProducts } from "@/lib/products";
 import { ButtonLink } from "@/components/ui/Button";
 
+// Les produits viennent de Prisma/Supabase : ne pas pré-rendre cette page
+// pendant le build Vercel, sinon le build peut épuiser le pool PostgreSQL.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function HomePage() {
   const [featured, all] = await Promise.all([getFeaturedProducts(6), getAllProducts()]);
   const [a, b] = all;
