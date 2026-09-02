@@ -6,6 +6,8 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
+const ADMIN_EMAIL = "immanouelj@gmail.com";
+
 async function getAdmin() {
   const cookieStore = cookies();
   const supabase = createServerClient(
@@ -24,13 +26,24 @@ async function getAdmin() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/compte");
 
+  const email = (user.email ?? "").trim().toLowerCase();
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
     select: { name: true, email: true, role: true },
   });
 
-  if (dbUser?.role !== "ADMIN") redirect("/");
-  return dbUser;
+  // L'adresse Google principale est autorisée administrateur côté serveur.
+  // Cela fonctionne même si le compte vient d'être créé via Google et que
+  // sa ligne Prisma n'existe pas encore.
+  const isAdmin = dbUser?.role === "ADMIN" || email === ADMIN_EMAIL;
+
+  if (!isAdmin) redirect("/");
+
+  return {
+    name: dbUser?.name ?? user.user_metadata?.full_name ?? user.user_metadata?.name ?? "",
+    email: dbUser?.email ?? user.email ?? "",
+    role: "ADMIN",
+  };
 }
 
 export default async function AdminPage() {
