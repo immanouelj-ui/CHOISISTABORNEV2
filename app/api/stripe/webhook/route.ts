@@ -3,12 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { verifyStripeWebhookSignature } from "@/lib/stripe";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const payload = await request.text();
   const signature = request.headers.get("stripe-signature");
 
-  if (!signature) return NextResponse.json({ error: "Missing Stripe signature" }, { status: 400 });
+  if (!signature) {
+    return NextResponse.json({ error: "Missing Stripe signature" }, { status: 400 });
+  }
 
   try {
     if (!verifyStripeWebhookSignature(payload, signature)) {
@@ -21,22 +24,37 @@ export async function POST(request: Request) {
 
     if (!orderId) return NextResponse.json({ received: true });
 
-    if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
+    if (
+      event.type === "checkout.session.completed" ||
+      event.type === "checkout.session.async_payment_succeeded"
+    ) {
       await prisma.$transaction(async (tx) => {
+        // Atomic claim prevents two Stripe deliveries from decrementing stock twice.
+        const paymentClaim = await tx.payment.updateMany({
+          where: {
+            orderId,
+            transactionId: session?.id,
+            status: "PENDING",
+          },
+          data: { status: "PROCESSING", updatedAt: new Date() },
+        });
+
+        if (paymentClaim.count !== 1) return;
+
         const order = await tx.order.findUnique({
           where: { id: orderId },
           include: { items: true },
         });
-
-        if (!order) return;
-        if (order.paymentStatus === "PAID") return;
+        if (!order || order.paymentStatus === "PAID") return;
 
         for (const item of order.items) {
           const result = await tx.product.updateMany({
-            where: { id: item.productId, stock: { gte: item.quantity } },
+            where: { id: item.productId, isActive: true, stock: { gte: item.quantity } },
             data: { stock: { decrement: item.quantity } },
           });
-          if (result.count !== 1) throw new Error(`Insufficient stock for product ${item.productId}`);
+          if (result.count !== 1) {
+            throw new Error(`Insufficient stock for product ${item.productId}`);
+          }
         }
 
         const now = new Date();
@@ -46,21 +64,30 @@ export async function POST(request: Request) {
         });
         await tx.payment.updateMany({
           where: { orderId: order.id, transactionId: session.id },
-          data: { status: "PAID", paymentMethod: session.payment_method_types?.[0] || "CARD", updatedAt: now },
+          data: {
+            status: "PAID",
+            paymentMethod: session.payment_method_types?.[0] || "CARD",
+            updatedAt: now,
+          },
         });
       });
     }
 
-    if (event.type === "checkout.session.expired" || event.type === "payment_intent.payment_failed") {
+    if (
+      event.type === "checkout.session.expired" ||
+      event.type === "payment_intent.payment_failed"
+    ) {
       const now = new Date();
-      await prisma.order.updateMany({
-        where: { id: orderId, paymentStatus: { not: "PAID" } },
-        data: { status: "CANCELLED", paymentStatus: "FAILED", updatedAt: now },
-      });
-      await prisma.payment.updateMany({
-        where: { orderId },
-        data: { status: "FAILED", updatedAt: now },
-      });
+      await prisma.$transaction([
+        prisma.order.updateMany({
+          where: { id: orderId, paymentStatus: { not: "PAID" } },
+          data: { status: "CANCELLED", paymentStatus: "FAILED", updatedAt: now },
+        }),
+        prisma.payment.updateMany({
+          where: { orderId, status: { not: "PAID" } },
+          data: { status: "FAILED", updatedAt: now },
+        }),
+      ]);
     }
 
     return NextResponse.json({ received: true });
