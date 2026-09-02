@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Simulator from "@/components/simulator/Simulator";
 import { getAllProducts } from "@/lib/products";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Simulateur — Trouvez votre borne idéale",
   description: "Répondez à quelques questions pour trouver la borne de recharge adaptée à votre véhicule et votre logement.",
