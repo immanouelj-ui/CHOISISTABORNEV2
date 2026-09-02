@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -35,22 +36,31 @@ export async function POST(request: Request) {
       options: { data: { full_name: data.name } },
     });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-    if (!authData.user) {
-      return NextResponse.json({ error: "Impossible de créer le compte." }, { status: 500 });
-    }
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (!authData.user) return NextResponse.json({ error: "Impossible de créer le compte." }, { status: 500 });
+
+    await prisma.user.upsert({
+      where: { id: authData.user.id },
+      create: {
+        id: authData.user.id,
+        email: authData.user.email ?? data.email.toLowerCase(),
+        name: data.name,
+        role: "CUSTOMER",
+        updatedAt: new Date(),
+      },
+      update: {
+        email: authData.user.email ?? data.email.toLowerCase(),
+        name: data.name,
+        updatedAt: new Date(),
+      },
+    });
 
     const response = NextResponse.json({
       user: { id: authData.user.id, email: authData.user.email, name: data.name },
       session: authData.session,
       emailConfirmationRequired: !authData.session,
     });
-
-    cookiesToSet.forEach(({ name, value, options }) => {
-      response.cookies.set(name, value, options as any);
-    });
+    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options as any));
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
     return response;
   } catch (error) {
