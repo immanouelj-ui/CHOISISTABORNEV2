@@ -5,9 +5,11 @@ import { cookies } from "next/headers";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+type CookieToSet = { name: string; value: string; options?: any };
+
 export async function POST() {
   const cookieStore = cookies();
-  const cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }> = [];
+  const cookiesToSet: CookieToSet[] = [];
 
   try {
     const supabase = createServerClient(
@@ -24,9 +26,7 @@ export async function POST() {
     await supabase.auth.signOut();
 
     const response = NextResponse.json({ ok: true });
-    cookiesToSet.forEach(({ name, value, options }) => {
-      response.cookies.set(name, value, options as any);
-    });
+    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
     return response;
   } catch (error) {
