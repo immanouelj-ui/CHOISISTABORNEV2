@@ -11,14 +11,21 @@ const schema = z.object({
     .max(128),
 });
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey) {
+    throw new Error("Supabase environment variables are missing.");
+  }
+
+  return createClient(url, anonKey);
+}
 
 export async function POST(request: Request) {
   try {
     const data = schema.parse(await request.json());
+    const supabase = getSupabaseClient();
 
     const { data: authData, error } = await supabase.auth.signUp({
       email: data.email.toLowerCase(),
