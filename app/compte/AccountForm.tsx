@@ -18,8 +18,15 @@ export default function AccountForm() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("error") === "google_auth") {
+    const authError = params.get("error");
+    if (authError === "google_auth") {
       setError("La connexion Google n'a pas pu être finalisée. Vérifiez la configuration Google/Supabase.");
+    } else if (authError === "google_config") {
+      setError("La connexion Google n'est pas encore configurée sur le serveur. Ajoutez les variables Supabase dans Vercel.");
+    } else if (authError === "auth_callback") {
+      setError("La connexion Google a échoué pendant le retour vers le site. Vérifiez les URL de redirection Supabase.");
+    } else if (authError === "missing_code") {
+      setError("La connexion Google est incomplète. Veuillez réessayer.");
     }
 
     fetch("/api/auth/me", { cache: "no-store" })
