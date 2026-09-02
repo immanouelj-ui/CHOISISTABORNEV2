@@ -18,7 +18,7 @@ async function requireAdmin() {
   );
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/compte");
-  if ((user.email ?? "").toLowerCase() === ADMIN_EMAIL) return user;
+  if ((user.email ?? "").trim().toLowerCase() === ADMIN_EMAIL) return user;
   const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { role: true } });
   if (dbUser?.role !== "ADMIN") redirect("/");
   return user;
@@ -40,13 +40,14 @@ export default async function AdminCataloguePage() {
           <Link href="/produits" className="rounded-xl border border-line px-4 py-3 text-sm hover:bg-paper/5">Voir le site</Link>
         </div>
         <div className="overflow-hidden rounded-2xl border border-line bg-ink-soft">
-          <div className="grid grid-cols-[1fr_120px_120px_120px] gap-4 border-b border-line p-4 text-xs uppercase tracking-wider text-paper/40"><span>Produit</span><span>Marque</span><span>Stock</span><span>Prix TTC</span></div>
+          <div className="grid grid-cols-[1fr_120px_120px_120px_100px] gap-4 border-b border-line p-4 text-xs uppercase tracking-wider text-paper/40"><span>Produit</span><span>Marque</span><span>Stock</span><span>Prix TTC</span><span>Action</span></div>
           {products.map((product) => (
-            <div key={product.id} className="grid grid-cols-[1fr_120px_120px_120px] gap-4 border-b border-line p-4 last:border-0 items-center">
+            <div key={product.id} className="grid grid-cols-[1fr_120px_120px_120px_100px] gap-4 border-b border-line p-4 last:border-0 items-center">
               <div><p className="font-medium">{product.name}</p><p className="text-xs text-paper/40">{product.sku} · {product.category.name}</p></div>
               <span className="text-sm text-paper/70">{product.brand.name}</span>
               <span className={product.stock > 0 ? "text-sm" : "text-sm text-red-400"}>{product.stock}</span>
               <span className="text-sm">{product.priceTTC.toFixed(2)} €</span>
+              <Link href={`/admin/catalogue/${product.id}`} className="rounded-lg border border-charge/40 px-3 py-2 text-center text-sm text-charge hover:bg-charge/10">Modifier</Link>
             </div>
           ))}
         </div>
