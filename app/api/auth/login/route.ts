@@ -1,27 +1,36 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { z } from "zod";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const schema = z.object({
   email: z.string().trim().email("Adresse e-mail invalide").max(160),
   password: z.string().min(1, "Mot de passe requis").max(128),
 });
 
-function getSupabaseClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !anonKey) {
-    throw new Error("Supabase environment variables are missing.");
-  }
-
-  return createClient(url, anonKey);
-}
-
 export async function POST(request: Request) {
   try {
     const data = schema.parse(await request.json());
-    const supabase = getSupabaseClient();
+    const cookieStore = cookies();
+    const response = NextResponse.json({ ok: true });
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => cookieStore.getAll(),
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
 
     const { data: authData, error } = await supabase.auth.signInWithPassword({
       email: data.email.toLowerCase(),
@@ -35,7 +44,9 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({
+    response.headers.set("Content-Type", "application/json");
+    response.body;
+    const body = JSON.stringify({
       user: {
         id: authData.user.id,
         email: authData.user.email,
@@ -46,6 +57,7 @@ export async function POST(request: Request) {
       },
       session: authData.session,
     });
+    return new NextResponse(body, { status: 200, headers: response.headers });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -53,9 +65,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
     console.error("LOGIN_ERROR", error);
-
     return NextResponse.json(
       { error: "Impossible de se connecter pour le moment." },
       { status: 500 }
