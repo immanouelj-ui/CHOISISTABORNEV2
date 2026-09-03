@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import ImageUploadField from "@/components/admin/ImageUploadField";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -106,9 +107,16 @@ export default async function EditProductPage({ params }: { params: { id: string
 
           <section className="rounded-2xl border border-line bg-ink-soft p-6">
             <h2 className="mb-2 text-xl font-semibold">Images du produit</h2>
-            <p className="mb-5 text-sm text-paper/50">Ajoute une URL par ligne. La première image peut être définie comme principale.</p>
-            <div className="space-y-4">
-              {[0,1,2,3,4].map((i) => <Field key={i} name={`image${i}`} label={`Image ${i + 1}`} value={product.images[i]?.url ?? ""} placeholder="https://..." />)}
+            <p className="mb-5 text-sm text-paper/50">Tu peux maintenant choisir une image depuis ton PC. Elle sera envoyée dans ton bucket Supabase « image » et son URL sera enregistrée avec le produit.</p>
+            <div className="space-y-5">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <ImageUploadField
+                  key={i}
+                  name={`image${i}`}
+                  label={`Image ${i + 1}${i === 0 ? " — principale" : ""}`}
+                  initialUrl={product.images[i]?.url ?? ""}
+                />
+              ))}
             </div>
           </section>
 
