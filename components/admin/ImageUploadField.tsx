@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
 
 export default function ImageUploadField({
@@ -29,9 +30,11 @@ export default function ImageUploadField({
         method: "POST",
         body: form,
       });
+
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.error || "Upload impossible");
+
       setUrl(data.url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload impossible");
@@ -43,6 +46,7 @@ export default function ImageUploadField({
   return (
     <div>
       <span className="mb-2 block text-sm text-paper/60">{label}</span>
+
       <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
         <input
           type="url"
@@ -52,6 +56,7 @@ export default function ImageUploadField({
           placeholder="https://... ou utilise Ajouter une image"
           className="w-full rounded-xl border border-line bg-ink px-4 py-3 text-paper outline-none focus:border-charge"
         />
+
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
@@ -61,6 +66,7 @@ export default function ImageUploadField({
           {uploading ? "Envoi…" : "Ajouter une image"}
         </button>
       </div>
+
       <input
         ref={inputRef}
         type="file"
@@ -68,16 +74,28 @@ export default function ImageUploadField({
         className="hidden"
         onChange={(e) => handleFile(e.target.files?.[0])}
       />
+
       {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+
       {url && (
         <div className="mt-3 flex items-center gap-3">
-          <img src={url} alt="Aperçu" className="h-20 w-20 rounded-lg border border-line object-cover" />
+          <Image
+            src={url}
+            alt="Aperçu"
+            width={80}
+            height={80}
+            className="h-20 w-20 rounded-lg border border-line object-cover"
+          />
+
           <button
             type="button"
-            onClick={() => { setUrl(""); if (inputRef.current) inputRef.current.value = ""; }}
+            onClick={() => {
+              setUrl("");
+              if (inputRef.current) inputRef.current.value = "";
+            }}
             className="text-sm text-paper/50 hover:text-red-400"
           >
-            Retirer l'image
+            Retirer l&apos;image
           </button>
         </div>
       )}
