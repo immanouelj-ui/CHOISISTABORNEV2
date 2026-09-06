@@ -12,9 +12,9 @@ const COLUMNS = [
     title: "Acheter",
     links: [
       { label: "Toutes les bornes", href: "/produits" },
-      { label: "Bornes 7,4 kW", href: "/produits?power=7.4" },
-      { label: "Bornes 11 kW", href: "/produits?power=11" },
-      { label: "Bornes 22 kW", href: "/produits?power=22" },
+      { label: "Bornes 7,4 kW", href: "/produits?minPower=7.4" },
+      { label: "Bornes 11 kW", href: "/produits?minPower=11" },
+      { label: "Bornes 22 kW", href: "/produits?minPower=22" },
       { label: "Simulateur", href: "/simulateur" },
     ],
   },
@@ -89,7 +89,7 @@ export default function Footer() {
               <h3 className="mb-4 text-sm text-fog">{col.title}</h3>
               <ul className="space-y-3">
                 {col.links.map((l) => (
-                  <li key={l.href}>
+                  <li key={`${col.title}-${l.label}`}>
                     <Link href={l.href} className="text-sm text-paper/80 transition-colors hover:text-paper">
                       {l.label}
                     </Link>
