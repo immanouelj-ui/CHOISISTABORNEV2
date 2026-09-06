@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs, { breadcrumbJsonLd } from "@/components/ui/Breadcrumbs";
 import InstallationRequestForm from "@/components/installation/InstallationRequestForm";
 import { ButtonLink } from "@/components/ui/Button";
-import { getLocalPage } from "@/lib/content";
+import { getLocalPage, getGuidesForCity } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -33,7 +34,8 @@ export default async function CityInstallationPage({
 }) {
   const result = await getLocalPage(params.departement, params.ville);
   if (!result) notFound();
-  const { city, localPage } = result;
+  const { city, localPage, siblingCities } = result;
+  const guides = await getGuidesForCity(city.slug);
 
   const faqEntries: { q: string; a: string }[] = localPage.faq ? JSON.parse(localPage.faq) : [];
 
@@ -118,6 +120,51 @@ export default async function CityInstallationPage({
             </div>
           </div>
         )}
+
+        <div className="mt-24 grid gap-16 md:grid-cols-2">
+          {siblingCities.length > 0 && (
+            <div>
+              <h2 className="mb-6 font-display text-lg text-paper">
+                Installation borne de recharge dans {city.department.name}
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {siblingCities.map((sibling) => (
+                  <Link
+                    key={sibling.id}
+                    href={`/installation-borne-recharge/${city.department.slug}/${sibling.slug}`}
+                    className="rounded-full border border-line px-4 py-2 text-sm text-paper/80 transition hover:border-charge hover:text-paper"
+                  >
+                    {sibling.name}
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href={`/installation-borne-recharge/${city.department.slug}`}
+                className="mt-4 inline-block text-sm text-paper/60 underline-offset-4 hover:text-paper hover:underline"
+              >
+                Voir tout le département {city.department.name} →
+              </Link>
+            </div>
+          )}
+
+          {guides.length > 0 && (
+            <div>
+              <h2 className="mb-6 font-display text-lg text-paper">Guides utiles</h2>
+              <ul className="space-y-3">
+                {guides.map((guide) => (
+                  <li key={guide.id}>
+                    <Link
+                      href={`/guides/${guide.slug}`}
+                      className="text-sm text-paper/80 underline-offset-4 transition hover:text-paper hover:underline"
+                    >
+                      {guide.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
