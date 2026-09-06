@@ -130,6 +130,7 @@ model Product {
   reviews        Review[]
   cartItems      CartItem[]
   orderItems     OrderItem[]
+  installationRequests InstallationRequest[]
 
   @@map("products")
 }
@@ -294,4 +295,134 @@ model Payment {
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("payments")
+}
+
+model InstallationRequest {
+  id            String   @id
+  firstName     String
+  lastName      String
+  email         String
+  phone         String
+  address       String?
+  postalCode    String?
+  city          String?
+  housingType   String?
+  vehicleBrand  String?
+  productId     String?
+  productName   String?
+  powerWanted   String?
+  hasBornAlready Boolean @default(false)
+  comment       String?
+  source        String   @default("SITE")
+  status        String   @default("NOUVEAU")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+
+  product Product?  @relation(fields: [productId], references: [id])
+  notes   LeadNote[]
+
+  @@map("installation_requests")
+}
+
+model LeadNote {
+  id        String   @id
+  leadId    String
+  author    String?
+  content   String
+  createdAt DateTime @default(now())
+
+  lead InstallationRequest @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@map("lead_notes")
+}
+
+model Department {
+  id          String   @id
+  code        String   @unique
+  name        String
+  slug        String   @unique
+  intro       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+
+  cities City[]
+
+  @@map("departments")
+}
+
+model City {
+  id           String   @id
+  departmentId String
+  name         String
+  slug         String
+  postalCode   String?
+  population   Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  localPage  LocalPage?
+
+  @@unique([departmentId, slug])
+  @@map("cities")
+}
+
+model LocalPage {
+  id              String   @id
+  cityId          String   @unique
+  title           String
+  metaDescription String
+  intro           String
+  content         String
+  faq             String?
+  isPublished     Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime
+
+  city City @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  @@map("local_pages")
+}
+
+model BlogPost {
+  id              String    @id
+  slug            String    @unique
+  title           String
+  excerpt         String
+  content         String
+  coverImage      String?
+  metaDescription String?
+  category        String?
+  isPublished     Boolean   @default(true)
+  publishedAt     DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime
+
+  @@map("blog_posts")
+}
+
+model ContactMessage {
+  id        String   @id
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("contact_messages")
+}
+
+model FaqItem {
+  id        String   @id
+  question  String
+  answer    String
+  category  String   @default("GENERAL")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+
+  @@map("faq_items")
 }

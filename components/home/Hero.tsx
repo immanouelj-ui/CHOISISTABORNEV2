@@ -48,12 +48,18 @@ export default function Hero() {
           Choisissez la borne qui vous correspond.
         </p>
 
-        <div data-hero-cta className="mt-10 flex items-center gap-6">
+        <div data-hero-cta className="mt-10 flex flex-wrap items-center gap-4 sm:gap-6">
           <Link
             href="/produits"
             className="inline-flex items-center gap-2 rounded-full bg-paper px-8 py-4 text-sm font-medium text-ink transition-colors duration-300 hover:bg-charge hover:text-paper"
           >
             Découvrir les bornes
+          </Link>
+          <Link
+            href="/installation"
+            className="inline-flex items-center gap-2 rounded-full border border-paper/40 px-8 py-4 text-sm font-medium text-paper transition-colors duration-300 hover:border-paper"
+          >
+            Faire installer ma borne
           </Link>
           <Link href="/simulateur" className="text-sm text-paper/70 underline-offset-4 hover:text-paper hover:underline">
             Trouver la mienne

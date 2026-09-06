@@ -67,9 +67,9 @@ export default function AnimatedHeader() {
 
           <nav className="hidden items-center gap-8 text-sm text-paper/80 md:flex">
             <Link href="/produits" className="transition-colors hover:text-paper">Produits</Link>
-            <Link href="/#solutions" className="transition-colors hover:text-paper">Solutions</Link>
+            <Link href="/installation" className="transition-colors hover:text-paper">Installation</Link>
             <Link href="/simulateur" className="transition-colors hover:text-paper">Simulateur</Link>
-            <Link href="/#conseils" className="transition-colors hover:text-paper">Conseils</Link>
+            <Link href="/guides" className="transition-colors hover:text-paper">Conseils</Link>
           </nav>
 
           <div className="flex items-center gap-4 text-paper">

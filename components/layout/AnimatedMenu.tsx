@@ -7,9 +7,9 @@ import { X } from "lucide-react";
 
 const LINKS = [
   { href: "/produits", label: "Produits" },
-  { href: "/#solutions", label: "Solutions" },
+  { href: "/installation", label: "Installation" },
   { href: "/simulateur", label: "Simulateur" },
-  { href: "/#conseils", label: "Conseils" },
+  { href: "/guides", label: "Conseils" },
 ];
 
 export default function AnimatedMenu({ open, onClose }: { open: boolean; onClose: () => void }) {

@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGsapContext } from "@/components/animations/useGsapContext";
 import type { ProductDTO } from "@/lib/types";
 import { connectivityLabel, installationLabel, phaseLabel } from "@/lib/types";
+import { ButtonLink } from "@/components/ui/Button";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -103,6 +104,13 @@ export default function ProductGallery({ product }: { product: ProductDTO }) {
               Nos installateurs partenaires interviennent partout en France et s&apos;occupent de la mise
               en conformité complète de votre installation électrique.
             </p>
+            <div className="mt-8 rounded-2xl border border-charge/30 bg-charge/10 p-6">
+              <p className="font-display text-lg text-paper">Cette borne vous intéresse ?</p>
+              <p className="mt-1 text-sm text-paper/70">Achetez-la et faites-la installer par un professionnel.</p>
+              <ButtonLink href={`/installation?produit=${product.slug}`} size="md" className="mt-4">
+                Demander mon installation
+              </ButtonLink>
+            </div>
           </div>
           <div data-pg-img className="order-1 relative aspect-[4/3] overflow-hidden rounded-3xl md:order-2">
             <Image src={installation.url} alt={installation.alt} fill sizes="(min-width: 768px) 45vw, 90vw" className="object-cover" />

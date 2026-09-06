@@ -6,6 +6,7 @@ import { Minus, Plus, X } from "lucide-react";
 import { useCartStore, cartTotal } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/types";
 import { ButtonLink } from "@/components/ui/Button";
+import CartInstallCrossSell from "@/components/installation/CartInstallCrossSell";
 
 export default function PanierPage() {
   const lines = useCartStore((s) => s.lines);
@@ -50,6 +51,8 @@ export default function PanierPage() {
                   </div>
                 </div>
               ))}
+
+              <CartInstallCrossSell productId={lines[0]?.productId} productName={lines[0]?.name} />
             </div>
 
             <div className="h-fit rounded-3xl border border-line p-8">
