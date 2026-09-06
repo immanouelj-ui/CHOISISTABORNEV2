@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs, { breadcrumbJsonLd } from "@/components/ui/Breadcrumbs";
 import { ButtonLink } from "@/components/ui/Button";
-import { getBlogPostBySlug } from "@/lib/content";
+import { getBlogPostBySlug, getCitiesForGuide } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -28,6 +29,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function GuideArticlePage({ params }: { params: { slug: string } }) {
   const post = await getBlogPostBySlug(params.slug);
   if (!post || !post.isPublished) notFound();
+  const cities = await getCitiesForGuide(post.slug);
 
   const crumbs = [
     { label: "Accueil", href: "/" },
@@ -79,6 +81,29 @@ export default async function GuideArticlePage({ params }: { params: { slug: str
             <ButtonLink href="/installation" variant="secondary">Demander une installation</ButtonLink>
           </div>
         </div>
+
+        {cities.length > 0 && (
+          <div className="mt-16">
+            <h2 className="mb-6 font-display text-lg text-paper">Installation près de chez vous</h2>
+            <div className="flex flex-wrap gap-2">
+              {cities.map((city) => (
+                <Link
+                  key={city.id}
+                  href={`/installation-borne-recharge/${city.department.slug}/${city.slug}`}
+                  className="rounded-full border border-line px-4 py-2 text-sm text-paper/80 transition hover:border-charge hover:text-paper"
+                >
+                  {city.name}
+                </Link>
+              ))}
+              <Link
+                href="/installation-borne-recharge"
+                className="rounded-full border border-line px-4 py-2 text-sm text-paper/60 transition hover:border-charge hover:text-paper"
+              >
+                Toutes nos zones d&apos;intervention →
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

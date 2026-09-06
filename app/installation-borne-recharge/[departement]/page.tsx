@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs, { breadcrumbJsonLd } from "@/components/ui/Breadcrumbs";
 import { ButtonLink } from "@/components/ui/Button";
-import { getDepartmentBySlug } from "@/lib/content";
+import { getDepartmentBySlug, getGuidesForCity } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: { params: { departement: stri
 export default async function DepartmentPage({ params }: { params: { departement: string } }) {
   const department = await getDepartmentBySlug(params.departement);
   if (!department) notFound();
+  const guides = await getGuidesForCity(department.slug);
 
   const crumbs = [
     { label: "Accueil", href: "/" },
@@ -62,6 +63,24 @@ export default async function DepartmentPage({ params }: { params: { departement
             </Link>
           ))}
         </div>
+
+        {guides.length > 0 && (
+          <div className="mt-16">
+            <h2 className="mb-6 font-display text-xl text-paper">Guides utiles</h2>
+            <ul className="flex flex-wrap gap-x-8 gap-y-3">
+              {guides.map((guide) => (
+                <li key={guide.id}>
+                  <Link
+                    href={`/guides/${guide.slug}`}
+                    className="text-sm text-paper/80 underline-offset-4 transition hover:text-paper hover:underline"
+                  >
+                    {guide.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

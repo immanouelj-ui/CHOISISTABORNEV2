@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGsapContext } from "@/components/animations/useGsapContext";
@@ -110,6 +111,12 @@ export default function ProductGallery({ product }: { product: ProductDTO }) {
               <ButtonLink href={`/installation?produit=${product.slug}`} size="md" className="mt-4">
                 Demander mon installation
               </ButtonLink>
+              <Link
+                href="/installation-borne-recharge"
+                className="mt-3 block text-xs text-paper/60 underline-offset-4 hover:text-paper hover:underline"
+              >
+                Voir nos zones d&apos;intervention près de chez vous →
+              </Link>
             </div>
           </div>
           <div data-pg-img className="order-1 relative aspect-[4/3] overflow-hidden rounded-3xl md:order-2">
