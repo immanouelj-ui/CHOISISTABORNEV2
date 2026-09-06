@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs, { breadcrumbJsonLd } from "@/components/ui/Breadcrumbs";
 import { ButtonLink } from "@/components/ui/Button";
 import { getDepartmentBySlug, getGuidesForCity } from "@/lib/content";
+import { pickShowcaseImage } from "@/lib/images";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -24,6 +26,7 @@ export default async function DepartmentPage({ params }: { params: { departement
   const department = await getDepartmentBySlug(params.departement);
   if (!department) notFound();
   const guides = await getGuidesForCity(department.slug);
+  const heroImage = pickShowcaseImage(department.slug);
 
   const crumbs = [
     { label: "Accueil", href: "/" },
@@ -48,6 +51,17 @@ export default async function DepartmentPage({ params }: { params: { departement
         <div className="mt-12 flex flex-wrap gap-4">
           <ButtonLink href="/installation#devis" size="lg">Demander un devis</ButtonLink>
           <ButtonLink href="/produits" variant="secondary" size="lg">Voir les bornes</ButtonLink>
+        </div>
+
+        <div className="relative mt-12 aspect-[21/9] w-full overflow-hidden rounded-3xl bg-ink-raised">
+          <Image
+            src={heroImage}
+            alt={`Installation de borne de recharge dans le département ${department.name}`}
+            fill
+            sizes="(min-width: 1024px) 1200px, 100vw"
+            className="object-cover"
+            priority
+          />
         </div>
 
         <h2 className="mt-16 mb-6 font-display text-xl text-paper">Villes couvertes dans le {department.name}</h2>

@@ -543,6 +543,7 @@ async function main() {
         excerpt: post.excerpt,
         content: post.content,
         category: post.category,
+        coverImage: post.coverImage,
         metaDescription: post.excerpt,
         isPublished: true,
         publishedAt: new Date(),

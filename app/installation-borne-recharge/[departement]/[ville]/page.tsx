@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs, { breadcrumbJsonLd } from "@/components/ui/Breadcrumbs";
 import InstallationRequestForm from "@/components/installation/InstallationRequestForm";
 import { ButtonLink } from "@/components/ui/Button";
 import { getLocalPage, getGuidesForCity } from "@/lib/content";
+import { pickShowcaseImage } from "@/lib/images";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -36,6 +38,7 @@ export default async function CityInstallationPage({
   if (!result) notFound();
   const { city, localPage, siblingCities } = result;
   const guides = await getGuidesForCity(city.slug);
+  const heroImage = pickShowcaseImage(city.slug);
 
   const faqEntries: { q: string; a: string }[] = localPage.faq ? JSON.parse(localPage.faq) : [];
 
@@ -89,6 +92,17 @@ export default async function CityInstallationPage({
         <div className="mt-8 flex flex-wrap gap-4">
           <ButtonLink href={`#devis-${city.slug}`} size="lg">Demander un devis à {city.name}</ButtonLink>
           <ButtonLink href="/produits" variant="secondary" size="lg">Voir les bornes</ButtonLink>
+        </div>
+
+        <div className="relative mt-12 aspect-[21/9] w-full overflow-hidden rounded-3xl bg-ink-raised">
+          <Image
+            src={heroImage}
+            alt={`Installation de borne de recharge à ${city.name}`}
+            fill
+            sizes="(min-width: 1024px) 1200px, 100vw"
+            className="object-cover"
+            priority
+          />
         </div>
 
         <div className="mt-16 grid gap-16 lg:grid-cols-[1.2fr_1fr]">
