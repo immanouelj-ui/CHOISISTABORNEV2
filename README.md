@@ -21,13 +21,24 @@ Le site est accessible sur **http://localhost:3000**.
 - **Accueil immersif** : Hero plein écran, animations GSAP, configurateur, galerie et comparateur.
 - **Catalogue** (`/produits`) : recherche, filtres, tri et fiches produit.
 - **Simulateur** (`/simulateur`) : recommandation de borne.
-- **Panier** (`/panier`) : panier Zustand persistant et modification des quantités.
+- **Panier** (`/panier`) : panier Zustand persistant, modification des quantités et cross-sell installation.
 - **Checkout client** (`/commande`) : coordonnées, adresse de livraison/facturation et validation du panier côté serveur.
 - **Paiement Stripe Checkout** : création d'une commande en base avant redirection Stripe, prix recalculés depuis PostgreSQL et contrôle du stock côté serveur.
 - **Webhook Stripe** (`/api/stripe/webhook`) : confirmation du paiement, passage de la commande à `PAID`, mise à jour du paiement et décrément du stock de manière transactionnelle et idempotente.
 - **Confirmation** (`/paiement/succes`) et **annulation** (`/paiement/annule`) du paiement.
-- **Prisma / Supabase PostgreSQL** : utilisateurs, produits, panier, commandes, lignes de commande, paiements, avis, coupons et adresses.
-- **SEO / accessibilité** : métadonnées, sitemap, robots, JSON-LD produit et respect de `prefers-reduced-motion`.
+- **Installation & génération de leads** (`/installation`) : formulaire de demande de devis, cross-sell sur le panier et les fiches produit, CRM interne (`/admin/prospects`) avec statuts et notes.
+- **SEO local** (`/installation-borne-recharge/[departement]/[ville]`) : pages locales éditoriales par département et par ville, avec FAQ et LocalBusiness JSON-LD, listées en base (`Department`, `City`, `LocalPage`).
+- **Conseils & guides** (`/guides`) : articles de blog SEO stockés en base (`BlogPost`).
+- **FAQ, À propos, Contact** et pages légales (`/mentions-legales`, `/cgv`, `/confidentialite`, `/cookies`) avec bandeau de gestion des cookies.
+- **Prisma / Supabase PostgreSQL** : utilisateurs, produits, panier, commandes, lignes de commande, paiements, avis, coupons, adresses, prospects d'installation, contenus locaux et blog.
+- **SEO / accessibilité** : métadonnées, sitemap (produits + pages locales + guides), robots, JSON-LD (Product, Organization, WebSite, BreadcrumbList, FAQPage, LocalBusiness, Article) et respect de `prefers-reduced-motion`.
+
+### Ce qui reste à construire
+
+Compte tenu de l'ampleur du cahier des charges, cette itération priorise le cœur e-commerce déjà en place et le
+moteur stratégique de génération de leads d'installation + SEO local/contenu. Restent notamment à développer :
+facturation PDF automatique, envoi d'emails transactionnels, gestion fine du stock (mouvements, seuils), variantes
+produits, promotions/codes promo côté admin, avis clients avec formulaire de dépôt, et intégration Analytics/GTM.
 
 ## Stripe — configuration
 

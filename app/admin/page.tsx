@@ -28,6 +28,8 @@ export default async function AdminPage() {
   const orders = await prisma.order.count();
   const paidOrders = await prisma.order.count({ where: { paymentStatus: "PAID" } });
   const products = await prisma.product.count({ where: { isActive: true } });
+  const newLeads = await prisma.installationRequest.count({ where: { status: "NOUVEAU" } });
+  const totalLeads = await prisma.installationRequest.count();
 
   return (
     <main className="min-h-screen bg-ink px-6 pb-24 pt-32 text-paper">
@@ -37,11 +39,12 @@ export default async function AdminPage() {
           <Link href="/admin/profil" className="rounded-xl border border-line px-5 py-3 text-sm text-paper transition hover:bg-paper/5">Mon profil admin</Link>
         </div>
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[["Clients", users], ["Commandes", orders], ["Commandes payées", paidOrders], ["Produits actifs", products]].map(([label, value]) => <div key={label} className="rounded-2xl border border-line bg-ink-soft p-6"><p className="text-sm text-paper/50">{label}</p><p className="mt-3 font-display text-4xl">{value}</p></div>)}
+          {[["Clients", users], ["Commandes", orders], ["Commandes payées", paidOrders], ["Produits actifs", products], ["Prospects installation", totalLeads], ["Nouveaux prospects", newLeads]].map(([label, value]) => <div key={label} className="rounded-2xl border border-line bg-ink-soft p-6"><p className="text-sm text-paper/50">{label}</p><p className="mt-3 font-display text-4xl">{value}</p></div>)}
         </section>
-        <section className="mt-8 grid gap-4 md:grid-cols-3">
+        <section className="mt-8 grid gap-4 md:grid-cols-4">
           <Link href="/admin/catalogue" className="rounded-2xl border border-line bg-ink-soft p-6 transition hover:border-charge/50"><p className="text-lg font-semibold">Catalogue</p><p className="mt-2 text-sm text-paper/50">Gérer et consulter les produits.</p><span className="mt-5 inline-block text-sm text-charge">Ouvrir →</span></Link>
           <Link href="/admin/commandes" className="rounded-2xl border border-line bg-ink-soft p-6 transition hover:border-charge/50"><p className="text-lg font-semibold">Commandes</p><p className="mt-2 text-sm text-paper/50">Consulter les commandes et paiements.</p><span className="mt-5 inline-block text-sm text-charge">Ouvrir →</span></Link>
+          <Link href="/admin/prospects" className="rounded-2xl border border-line bg-ink-soft p-6 transition hover:border-charge/50"><p className="text-lg font-semibold">Prospects installation</p><p className="mt-2 text-sm text-paper/50">Suivre et qualifier les demandes d&apos;installation.</p><span className="mt-5 inline-block text-sm text-charge">Ouvrir →</span></Link>
           <Link href="/admin/profil" className="rounded-2xl border border-line bg-ink-soft p-6 transition hover:border-charge/50"><p className="text-lg font-semibold">Profil admin</p><p className="mt-2 text-sm text-paper/50">Voir les informations du compte administrateur.</p><span className="mt-5 inline-block text-sm text-charge">Ouvrir →</span></Link>
         </section>
       </div>

@@ -9,29 +9,48 @@ gsap.registerPlugin(ScrollTrigger);
 
 const COLUMNS = [
   {
-    title: "Boutique",
+    title: "Acheter",
     links: [
-      { label: "Produits", href: "/produits" },
+      { label: "Toutes les bornes", href: "/produits" },
+      { label: "Bornes 7,4 kW", href: "/produits?power=7.4" },
+      { label: "Bornes 11 kW", href: "/produits?power=11" },
+      { label: "Bornes 22 kW", href: "/produits?power=22" },
       { label: "Simulateur", href: "/simulateur" },
-      { label: "Comparateur", href: "/#comparateur" },
     ],
   },
   {
-    title: "Accompagnement",
+    title: "Installation",
     links: [
-      { label: "Installation", href: "/#installation" },
-      { label: "Conseils", href: "/#conseils" },
-      { label: "FAQ", href: "/#faq" },
-      { label: "Contact", href: "/#contact" },
+      { label: "Installation borne de recharge", href: "/installation" },
+      { label: "Demander un devis", href: "/installation#devis" },
+      { label: "Zones d'intervention", href: "/installation-borne-recharge" },
     ],
   },
   {
-    title: "Légal",
+    title: "Informations",
     links: [
-      { label: "CGV", href: "/#cgv" },
-      { label: "Confidentialité", href: "/#confidentialite" },
+      { label: "À propos", href: "/a-propos" },
+      { label: "Contact", href: "/contact" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Guides", href: "/guides" },
     ],
   },
+  {
+    title: "Mon compte",
+    links: [
+      { label: "Connexion", href: "/compte" },
+      { label: "Créer un compte", href: "/compte" },
+      { label: "Mes commandes", href: "/compte" },
+    ],
+  },
+];
+
+const LEGAL_LINKS = [
+  { label: "Mentions légales", href: "/mentions-legales" },
+  { label: "CGV", href: "/cgv" },
+  { label: "Politique de confidentialité", href: "/confidentialite" },
+  { label: "Gestion des cookies", href: "/cookies" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Footer() {
@@ -79,21 +98,22 @@ export default function Footer() {
               </ul>
             </div>
           ))}
-          <div>
-            <h3 className="mb-4 text-sm text-fog">Suivez-nous</h3>
-            <ul className="space-y-3 text-sm text-paper/80">
-              <li>Instagram</li>
-              <li>LinkedIn</li>
-            </ul>
-          </div>
         </div>
 
         <div
           data-footer-reveal
-          className="mt-16 flex flex-col gap-2 border-t border-line pt-6 text-xs text-fog md:flex-row md:items-center md:justify-between"
+          className="mt-16 flex flex-col gap-4 border-t border-line pt-6 text-xs text-fog md:flex-row md:items-center md:justify-between"
         >
           <p>© {new Date().getFullYear()} CHOISISTABORNE. Tous droits réservés.</p>
-          <p>Conçu pour la mobilité électrique.</p>
+          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            {LEGAL_LINKS.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="transition-colors hover:text-paper">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </footer>
