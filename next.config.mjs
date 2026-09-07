@@ -318,6 +318,8 @@ const legacyRedirects = [
   { source: "/guides/voyant-rouge-borne-recharge", destination: "/guides", permanent: true },
   { source: "/guides/wallbox-connectee", destination: "/guides/borne-de-recharge-connectee", permanent: true },
   { source: "/installateur-irve", destination: "/installation", permanent: true },
+  { source: "/installateur-irve/$dept", destination: "/installation-borne-recharge", permanent: true },
+  { source: "/guides/$slug", destination: "/guides", permanent: true },
   { source: "/installateur-irve/alpes-maritimes", destination: "/installation-borne-recharge/alpes-maritimes", permanent: true },
   { source: "/installateur-irve/aube", destination: "/installation-borne-recharge/aube", permanent: true },
   { source: "/installateur-irve/bas-rhin", destination: "/installation-borne-recharge/bas-rhin", permanent: true },
