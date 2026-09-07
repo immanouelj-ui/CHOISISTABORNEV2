@@ -312,6 +312,11 @@ model InstallationRequest {
   productName   String?
   powerWanted   String?
   hasBornAlready Boolean @default(false)
+  propertyStatus String?
+  meterType      String?
+  meterDistance  String?
+  timeline       String?
+  hasElectricVehicle Boolean?
   comment       String?
   source        String   @default("SITE")
   status        String   @default("NOUVEAU")

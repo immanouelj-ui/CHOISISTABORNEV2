@@ -18,6 +18,11 @@ export type CreateLeadInput = {
   productName?: string;
   powerWanted?: string;
   hasBornAlready?: boolean;
+  propertyStatus?: string;
+  meterType?: string;
+  meterDistance?: string;
+  timeline?: string;
+  hasElectricVehicle?: boolean;
   comment?: string;
   source?: string;
 };
@@ -39,6 +44,11 @@ export async function createInstallationRequest(input: CreateLeadInput) {
       productName: input.productName,
       powerWanted: input.powerWanted,
       hasBornAlready: input.hasBornAlready ?? false,
+      propertyStatus: input.propertyStatus,
+      meterType: input.meterType,
+      meterDistance: input.meterDistance,
+      timeline: input.timeline,
+      hasElectricVehicle: input.hasElectricVehicle,
       comment: input.comment,
       source: input.source ?? "SITE",
       status: "NOUVEAU",
@@ -63,6 +73,11 @@ export async function createInstallationRequest(input: CreateLeadInput) {
     logement: input.housingType,
     marque: input.vehicleBrand,
     puissance: input.powerWanted,
+    statut_du_bien: input.propertyStatus,
+    compteur: input.meterType,
+    distance: input.meterDistance,
+    dlai: input.timeline,
+    vehicule: input.hasElectricVehicle === undefined ? undefined : input.hasElectricVehicle ? "oui" : "non",
     notes: notesParts.length ? notesParts.join(" — ") : undefined,
     source: `CHOISISTABORNE - ${input.source ?? "SITE"}`,
     statut: "Lead",

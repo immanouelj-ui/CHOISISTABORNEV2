@@ -49,6 +49,11 @@ export async function POST(request: Request) {
       productName: product?.name ?? (clean(body.productName) || undefined),
       powerWanted: clean(body.powerWanted) || undefined,
       hasBornAlready: Boolean(body.hasBornAlready),
+      propertyStatus: clean(body.propertyStatus) || undefined,
+      meterType: clean(body.meterType) || undefined,
+      meterDistance: clean(body.meterDistance) || undefined,
+      timeline: clean(body.timeline) || undefined,
+      hasElectricVehicle: body.hasElectricVehicle === undefined ? undefined : Boolean(body.hasElectricVehicle),
       comment: clean(body.comment) || undefined,
       source: clean(body.source) || "SITE",
     });

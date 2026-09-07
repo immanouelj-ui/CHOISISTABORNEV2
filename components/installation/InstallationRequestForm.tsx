@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/Button";
 
 const HOUSING_TYPES = ["Maison", "Appartement", "Copropriété", "Entreprise", "Parking professionnel"];
 const POWERS = ["3,7 kW", "7,4 kW", "11 kW", "22 kW", "Je ne sais pas"];
+const PROPERTY_STATUSES = ["Propriétaire", "Locataire"];
+const METER_TYPES = ["Monophasé", "Triphasé", "Je ne sais pas"];
+const METER_DISTANCES = ["Moins de 5 m", "5 à 10 m", "10 à 20 m", "Plus de 20 m", "Je ne sais pas"];
+const TIMELINES = ["Urgent (sous 2 semaines)", "Dans le mois", "Dans les 3 mois", "Pas pressé"];
 
 const inputClass =
   "w-full rounded-xl border border-line bg-ink px-4 py-3 text-paper outline-none transition focus:border-charge";
@@ -27,6 +31,11 @@ export default function InstallationRequestForm({
   const [housingType, setHousingType] = useState("");
   const [powerWanted, setPowerWanted] = useState("");
   const [hasBornAlready, setHasBornAlready] = useState(Boolean(productId));
+  const [propertyStatus, setPropertyStatus] = useState("");
+  const [meterType, setMeterType] = useState("");
+  const [meterDistance, setMeterDistance] = useState("");
+  const [timeline, setTimeline] = useState("");
+  const [hasElectricVehicle, setHasElectricVehicle] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,6 +55,11 @@ export default function InstallationRequestForm({
       vehicleBrand: form.get("vehicleBrand"),
       powerWanted,
       hasBornAlready,
+      propertyStatus,
+      meterType,
+      meterDistance,
+      timeline,
+      hasElectricVehicle,
       comment: form.get("comment"),
       productId,
       productName,
@@ -143,7 +157,53 @@ export default function InstallationRequestForm({
           <span className={labelClass}>Marque de votre véhicule</span>
           <input name="vehicleBrand" className={inputClass} placeholder="Tesla, Renault, Peugeot…" />
         </label>
+        <label className="block">
+          <span className={labelClass}>Statut du bien</span>
+          <select value={propertyStatus} onChange={(e) => setPropertyStatus(e.target.value)} className={inputClass}>
+            <option value="">Sélectionner…</option>
+            {PROPERTY_STATUSES.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </label>
+        <label className="block">
+          <span className={labelClass}>Type de compteur électrique</span>
+          <select value={meterType} onChange={(e) => setMeterType(e.target.value)} className={inputClass}>
+            <option value="">Sélectionner…</option>
+            {METER_TYPES.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </label>
+        <label className="block">
+          <span className={labelClass}>Distance compteur ↔ emplacement borne</span>
+          <select value={meterDistance} onChange={(e) => setMeterDistance(e.target.value)} className={inputClass}>
+            <option value="">Sélectionner…</option>
+            {METER_DISTANCES.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+        </label>
+        <label className="block">
+          <span className={labelClass}>Délai souhaité</span>
+          <select value={timeline} onChange={(e) => setTimeline(e.target.value)} className={inputClass}>
+            <option value="">Sélectionner…</option>
+            {TIMELINES.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </label>
       </div>
+
+      <label className="flex items-center gap-3 text-sm text-paper/70">
+        <input
+          type="checkbox"
+          checked={hasElectricVehicle}
+          onChange={(e) => setHasElectricVehicle(e.target.checked)}
+          className="h-4 w-4 rounded border-line"
+        />
+        Je possède déjà un véhicule électrique
+      </label>
 
       {!productId && (
         <label className="flex items-center gap-3 text-sm text-paper/70">

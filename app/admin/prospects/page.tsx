@@ -77,8 +77,15 @@ export default async function AdminProspectsPage({
 
               <div className="text-sm text-paper/70">
                 {lead.housingType && <p>Logement : {lead.housingType}</p>}
+                {lead.propertyStatus && <p>Statut du bien : {lead.propertyStatus}</p>}
                 {lead.vehicleBrand && <p>Véhicule : {lead.vehicleBrand}</p>}
+                {lead.hasElectricVehicle !== null && (
+                  <p>Possède déjà un VE : {lead.hasElectricVehicle ? "Oui" : "Non"}</p>
+                )}
                 {lead.powerWanted && <p>Puissance : {lead.powerWanted}</p>}
+                {lead.meterType && <p>Compteur : {lead.meterType}</p>}
+                {lead.meterDistance && <p>Distance compteur/borne : {lead.meterDistance}</p>}
+                {lead.timeline && <p>Délai souhaité : {lead.timeline}</p>}
                 {lead.product && <p>Borne : {lead.product.name}</p>}
                 {lead.comment && <p className="mt-2 italic text-paper/50">« {lead.comment} »</p>}
                 {lead.notes.length > 0 && (
