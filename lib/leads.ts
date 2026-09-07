@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { pushLeadToCrm } from "@/lib/crm";
 
 export { LEAD_STATUSES, LEAD_STATUS_LABELS } from "@/lib/lead-status";
 export type { LeadStatus } from "@/lib/lead-status";
@@ -22,7 +23,7 @@ export type CreateLeadInput = {
 };
 
 export async function createInstallationRequest(input: CreateLeadInput) {
-  return prisma.installationRequest.create({
+  const lead = await prisma.installationRequest.create({
     data: {
       id: crypto.randomUUID(),
       firstName: input.firstName,
@@ -44,6 +45,25 @@ export async function createInstallationRequest(input: CreateLeadInput) {
       updatedAt: new Date(),
     },
   });
+
+  await pushLeadToCrm({
+    nom: `${input.firstName} ${input.lastName}`.trim(),
+    email: input.email,
+    phone: input.phone,
+    adresse: input.address,
+    code_postal: input.postalCode,
+    ville: input.city,
+    type_logement: input.housingType,
+    marque_vehicule: input.vehicleBrand,
+    produit: input.productName,
+    puissance_souhaitee: input.powerWanted,
+    possede_deja_borne: input.hasBornAlready ? "oui" : "non",
+    commentaire: input.comment,
+    source: `CHOISISTABORNE - ${input.source ?? "SITE"}`,
+    statut: "Lead",
+  });
+
+  return lead;
 }
 
 export async function listLeads(status?: string) {
