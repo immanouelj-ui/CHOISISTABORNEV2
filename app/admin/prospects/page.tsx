@@ -88,6 +88,21 @@ export default async function AdminProspectsPage({
                 {lead.timeline && <p>Délai souhaité : {lead.timeline}</p>}
                 {lead.product && <p>Borne : {lead.product.name}</p>}
                 {lead.comment && <p className="mt-2 italic text-paper/50">« {lead.comment} »</p>}
+                {lead.photoUrls.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {lead.photoUrls.map((url) => (
+                      <a
+                        key={url}
+                        href={url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-lg border border-line px-2 py-1 text-xs text-paper/60 hover:border-charge hover:text-paper"
+                      >
+                        Photo
+                      </a>
+                    ))}
+                  </div>
+                )}
                 {lead.notes.length > 0 && (
                   <div className="mt-3 space-y-1 border-t border-line pt-3">
                     {lead.notes.map((note) => (

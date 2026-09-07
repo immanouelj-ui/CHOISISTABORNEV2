@@ -2,6 +2,9 @@
 
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { uploadFileToUploadcare } from "@/lib/uploadcare";
+
+const MAX_PHOTOS = 8;
 
 const HOUSING_TYPES = ["Maison", "Appartement", "Copropriété", "Entreprise", "Parking professionnel"];
 const POWERS = ["3,7 kW", "7,4 kW", "11 kW", "22 kW", "Je ne sais pas"];
@@ -36,11 +39,30 @@ export default function InstallationRequestForm({
   const [meterDistance, setMeterDistance] = useState("");
   const [timeline, setTimeline] = useState("");
   const [hasElectricVehicle, setHasElectricVehicle] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+
+  function handlePhotos(files: FileList | null) {
+    if (!files || !files.length) return;
+    setPhotos((prev) => [...prev, ...Array.from(files)].slice(0, MAX_PHOTOS));
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setLoading(true);
+
+    setUploadingPhotos(photos.length > 0);
+    const photoUrls: string[] = [];
+    for (const photo of photos) {
+      try {
+        const url = await uploadFileToUploadcare(photo);
+        if (url) photoUrls.push(url);
+      } catch {
+        // L'échec d'une photo n'empêche pas l'envoi du reste de la demande.
+      }
+    }
+    setUploadingPhotos(false);
 
     const form = new FormData(event.currentTarget);
     const payload = {
@@ -60,6 +82,7 @@ export default function InstallationRequestForm({
       meterDistance,
       timeline,
       hasElectricVehicle,
+      photos: photoUrls,
       comment: form.get("comment"),
       productId,
       productName,
@@ -218,6 +241,25 @@ export default function InstallationRequestForm({
       )}
 
       <label className="block">
+        <span className={labelClass}>Photos de votre tableau électrique (optionnel)</span>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => handlePhotos(e.target.files)}
+          className={`${inputClass} file:mr-3 file:rounded-lg file:border-0 file:bg-charge file:px-3 file:py-2 file:text-ink`}
+        />
+        <p className="mt-2 text-xs text-fog">
+          Plus vos photos sont précises, plus le devis sera juste (jusqu&apos;à {MAX_PHOTOS}).
+        </p>
+        {photos.length > 0 && (
+          <p className="mt-2 text-sm text-paper/70">
+            {photos.length} photo{photos.length > 1 ? "s" : ""} ajoutée{photos.length > 1 ? "s" : ""}
+          </p>
+        )}
+      </label>
+
+      <label className="block">
         <span className={labelClass}>Commentaire (optionnel)</span>
         <textarea name="comment" rows={3} className={inputClass} placeholder="Précisions sur votre projet…" />
       </label>
@@ -225,7 +267,7 @@ export default function InstallationRequestForm({
       {error && <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">{error}</p>}
 
       <Button type="submit" disabled={loading} className="w-full" size="lg">
-        {loading ? "Envoi en cours…" : "Demander mon installation"}
+        {uploadingPhotos ? "Envoi des photos…" : loading ? "Envoi en cours…" : "Demander mon installation"}
       </Button>
       <p className="text-center text-xs text-fog">
         Vos informations sont utilisées uniquement pour traiter votre demande d&apos;installation.

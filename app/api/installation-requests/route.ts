@@ -10,6 +10,16 @@ function clean(value: unknown) {
 }
 
 const PHONE_REGEX = /^[0-9+()\s.-]{6,20}$/;
+const URL_REGEX = /^https:\/\//i;
+
+function cleanPhotoUrls(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter((item) => URL_REGEX.test(item))
+    .slice(0, 8);
+}
 
 export async function POST(request: Request) {
   try {
@@ -54,6 +64,7 @@ export async function POST(request: Request) {
       meterDistance: clean(body.meterDistance) || undefined,
       timeline: clean(body.timeline) || undefined,
       hasElectricVehicle: body.hasElectricVehicle === undefined ? undefined : Boolean(body.hasElectricVehicle),
+      photoUrls: cleanPhotoUrls(body.photos),
       comment: clean(body.comment) || undefined,
       source: clean(body.source) || "SITE",
     });
