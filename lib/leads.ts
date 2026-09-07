@@ -23,6 +23,7 @@ export type CreateLeadInput = {
   meterDistance?: string;
   timeline?: string;
   hasElectricVehicle?: boolean;
+  photoUrls?: string[];
   comment?: string;
   source?: string;
 };
@@ -49,6 +50,7 @@ export async function createInstallationRequest(input: CreateLeadInput) {
       meterDistance: input.meterDistance,
       timeline: input.timeline,
       hasElectricVehicle: input.hasElectricVehicle,
+      photoUrls: input.photoUrls ?? [],
       comment: input.comment,
       source: input.source ?? "SITE",
       status: "NOUVEAU",
@@ -78,6 +80,7 @@ export async function createInstallationRequest(input: CreateLeadInput) {
     distance: input.meterDistance,
     dlai: input.timeline,
     vehicule: input.hasElectricVehicle === undefined ? undefined : input.hasElectricVehicle ? "oui" : "non",
+    photos: input.photoUrls && input.photoUrls.length ? input.photoUrls : undefined,
     notes: notesParts.length ? notesParts.join(" — ") : undefined,
     source: `CHOISISTABORNE - ${input.source ?? "SITE"}`,
     statut: "Lead",

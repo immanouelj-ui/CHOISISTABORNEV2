@@ -1,7 +1,7 @@
 const CRM_LEADS_ENDPOINT =
   process.env.CRM_LEADS_WEBHOOK_URL ?? "https://crm-zeta-two-60.vercel.app/api/public/leads";
 
-export type CrmLeadPayload = Record<string, string | undefined>;
+export type CrmLeadPayload = Record<string, string | string[] | undefined>;
 
 /**
  * Transmet un lead au CRM externe (endpoint public à clé API, voir immanouelj-ui/crm).

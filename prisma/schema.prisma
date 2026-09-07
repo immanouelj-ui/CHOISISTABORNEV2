@@ -317,6 +317,7 @@ model InstallationRequest {
   meterDistance  String?
   timeline       String?
   hasElectricVehicle Boolean?
+  photoUrls     String[] @default([])
   comment       String?
   source        String   @default("SITE")
   status        String   @default("NOUVEAU")
