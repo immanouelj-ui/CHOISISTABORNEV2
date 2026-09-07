@@ -1,5 +1,5 @@
 const CRM_LEADS_ENDPOINT =
-  process.env.CRM_LEADS_WEBHOOK_URL ?? "https://crm-pro-backend.fly.dev/api/public/leads";
+  process.env.CRM_LEADS_WEBHOOK_URL ?? "https://crm-zeta-two-60.vercel.app/api/public/leads";
 
 export type CrmLeadPayload = Record<string, string | undefined>;
 

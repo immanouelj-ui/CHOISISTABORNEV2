@@ -46,19 +46,24 @@ export async function createInstallationRequest(input: CreateLeadInput) {
     },
   });
 
+  const notesParts = [
+    input.comment,
+    input.productName ? `Produit souhaité : ${input.productName}` : undefined,
+    input.hasBornAlready ? "Possède déjà sa borne, cherche uniquement l'installation." : undefined,
+  ].filter(Boolean);
+
   await pushLeadToCrm({
-    nom: `${input.firstName} ${input.lastName}`.trim(),
+    prenom: input.firstName,
+    nom: input.lastName,
     email: input.email,
     phone: input.phone,
     adresse: input.address,
-    code_postal: input.postalCode,
+    cp: input.postalCode,
     ville: input.city,
-    type_logement: input.housingType,
-    marque_vehicule: input.vehicleBrand,
-    produit: input.productName,
-    puissance_souhaitee: input.powerWanted,
-    possede_deja_borne: input.hasBornAlready ? "oui" : "non",
-    commentaire: input.comment,
+    logement: input.housingType,
+    marque: input.vehicleBrand,
+    puissance: input.powerWanted,
+    notes: notesParts.length ? notesParts.join(" — ") : undefined,
     source: `CHOISISTABORNE - ${input.source ?? "SITE"}`,
     statut: "Lead",
   });
