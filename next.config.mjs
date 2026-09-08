@@ -373,6 +373,7 @@ const nextConfig = {
     formats: ["image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "gidcbpqeqwgmuihpfmus.supabase.co", pathname: "/storage/v1/object/public/**" },
     ],
   },
   eslint: {

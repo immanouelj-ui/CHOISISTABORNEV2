@@ -72,6 +72,7 @@ export async function POST(request: Request) {
     });
 
     await prisma.productImage.deleteMany({ where: { productId: id } });
+    const KIND_BY_SLOT = ["main", "detail", "closeup", "installation", "detail"];
     const imageValues = [0, 1, 2, 3, 4]
       .map(i => text(form.get(`image${i}`)))
       .filter(Boolean);
@@ -84,6 +85,7 @@ export async function POST(request: Request) {
           url,
           alt: text(form.get("name")) || null,
           isPrimary: order === 0,
+          kind: KIND_BY_SLOT[order] ?? "detail",
           order,
         })),
       });
