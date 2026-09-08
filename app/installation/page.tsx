@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Installation de borne de recharge — CHOISISTABORNE",
     description: "Devis gratuit et mise en relation avec un installateur IRVE près de chez vous.",
+    images: ["/images/products/chargepoint-home-flex-installation.webp"],
   },
 };
 

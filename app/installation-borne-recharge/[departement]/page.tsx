@@ -15,10 +15,13 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export async function generateMetadata({ params }: { params: { departement: string } }): Promise<Metadata> {
   const department = await getDepartmentBySlug(params.departement);
   if (!department) return {};
+  const title = `Installation borne de recharge ${department.name}`;
+  const description = `Installateur de borne de recharge qualifié IRVE dans le département ${department.name}. Devis gratuit et intervention rapide.`;
   return {
-    title: `Installation borne de recharge ${department.name}`,
-    description: `Installateur de borne de recharge qualifié IRVE dans le département ${department.name}. Devis gratuit et intervention rapide.`,
+    title,
+    description,
     alternates: { canonical: `/installation-borne-recharge/${department.slug}` },
+    openGraph: { title, description, images: [pickShowcaseImage(department.slug)] },
   };
 }
 

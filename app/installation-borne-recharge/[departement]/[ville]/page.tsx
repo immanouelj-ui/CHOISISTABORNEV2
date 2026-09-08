@@ -25,7 +25,11 @@ export async function generateMetadata({
     title: localPage.title,
     description: localPage.metaDescription,
     alternates: { canonical: `/installation-borne-recharge/${params.departement}/${city.slug}` },
-    openGraph: { title: localPage.title, description: localPage.metaDescription },
+    openGraph: {
+      title: localPage.title,
+      description: localPage.metaDescription,
+      images: [pickShowcaseImage(city.slug)],
+    },
   };
 }
 

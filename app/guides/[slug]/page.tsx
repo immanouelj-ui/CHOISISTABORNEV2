@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import Breadcrumbs, { breadcrumbJsonLd } from "@/components/ui/Breadcrumbs";
 import { ButtonLink } from "@/components/ui/Button";
 import { getBlogPostBySlug, getCitiesForGuide } from "@/lib/content";
+import { pickShowcaseImage } from "@/lib/images";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     openGraph: {
       title: post.title,
       description: post.metaDescription ?? post.excerpt,
-      images: post.coverImage ? [post.coverImage] : undefined,
+      images: [post.coverImage ?? pickShowcaseImage(post.slug)],
     },
   };
 }
