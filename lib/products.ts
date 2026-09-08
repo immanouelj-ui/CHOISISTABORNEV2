@@ -17,6 +17,7 @@ type PrismaProduct = Awaited<ReturnType<typeof prisma.product.findMany>>[number]
     url: string;
     alt: string | null;
     isPrimary: boolean;
+    kind: string;
     order: number;
   }>;
 };
@@ -59,7 +60,7 @@ function toProductDTO(product: PrismaProduct): ProductDTO {
       id: image.id,
       url: image.url,
       alt: image.alt ?? product.name,
-      kind: image.isPrimary ? "main" : "detail",
+      kind: image.kind,
       position: image.order,
     })),
   };

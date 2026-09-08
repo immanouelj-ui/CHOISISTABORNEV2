@@ -109,11 +109,11 @@ export default async function EditProductPage({ params }: { params: { id: string
             <h2 className="mb-2 text-xl font-semibold">Images du produit</h2>
             <p className="mb-5 text-sm text-paper/50">Tu peux maintenant choisir une image depuis ton PC. Elle sera envoyée dans ton bucket Supabase « image » et son URL sera enregistrée avec le produit.</p>
             <div className="space-y-5">
-              {[0, 1, 2, 3, 4].map((i) => (
+              {["Image principale", "Détail", "Vue rapprochée", "Installation", "Détail supplémentaire"].map((label, i) => (
                 <ImageUploadField
                   key={i}
                   name={`image${i}`}
-                  label={`Image ${i + 1}${i === 0 ? " — principale" : ""}`}
+                  label={label}
                   initialUrl={product.images[i]?.url ?? ""}
                 />
               ))}

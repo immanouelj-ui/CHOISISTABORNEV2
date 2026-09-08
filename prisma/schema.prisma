@@ -141,6 +141,7 @@ model ProductImage {
   url       String
   alt       String?
   isPrimary Boolean  @default(false)
+  kind      String   @default("detail")
   order     Int      @default(0)
   createdAt DateTime @default(now())
 
