@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { Menu, Search, User, ShoppingBag, ShieldCheck } from "lucide-react";
@@ -61,8 +62,9 @@ export default function AnimatedHeader() {
     <>
       <header ref={headerRef} className="fixed inset-x-0 top-0 z-50 border-b border-transparent px-6 py-6 md:px-12" style={{ backgroundColor: "rgba(11,13,16,0)" }}>
         <div className="mx-auto flex max-w-content items-center justify-between">
-          <Link href="/" className="font-display text-lg tracking-tight text-paper">
-            <span className="font-light">choisis</span><span className="font-normal text-fog">ta</span><span className="font-extrabold">borne</span>
+          <Link href="/" className="flex items-center gap-2 font-display text-lg tracking-tight text-paper">
+            <Image src="/images/misc/logo-plug.png" alt="" width={28} height={30} className="h-7 w-auto" priority />
+            <span><span className="font-light">choisis</span><span className="font-normal text-fog">ta</span><span className="font-extrabold">borne</span></span>
           </Link>
 
           <nav className="hidden items-center gap-8 text-sm text-paper/80 md:flex">
