@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { unstable_cache } from "next/cache";
 import { getAllProducts } from "@/lib/products";
 import { getAllDepartments, getPublishedBlogPosts } from "@/lib/content";
 
@@ -7,14 +8,26 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 // Le sitemap lit Prisma/Supabase : il doit être généré à la demande,
 // pas pendant le build Vercel.
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+
+// Un crawler (Googlebot) peut passer à tout moment ; les requêtes sont mises
+// en cache 1h via unstable_cache pour ne pas dépendre de la base de données
+// à chaque passage, et chacune est isolée (Promise.allSettled) pour qu'un
+// aléa transitoire sur l'une n'empêche pas de servir les autres URLs
+// (Google avait signalé "Impossible de récupérer le sitemap").
+const getCachedProducts = unstable_cache(getAllProducts, ["sitemap-products"], { revalidate: 3600 });
+const getCachedDepartments = unstable_cache(getAllDepartments, ["sitemap-departments"], { revalidate: 3600 });
+const getCachedPosts = unstable_cache(getPublishedBlogPosts, ["sitemap-posts"], { revalidate: 3600 });
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, departments, posts] = await Promise.all([
-    getAllProducts(),
-    getAllDepartments(),
-    getPublishedBlogPosts(),
+  const [productsResult, departmentsResult, postsResult] = await Promise.allSettled([
+    getCachedProducts(),
+    getCachedDepartments(),
+    getCachedPosts(),
   ]);
+
+  const products = productsResult.status === "fulfilled" ? productsResult.value : [];
+  const departments = departmentsResult.status === "fulfilled" ? departmentsResult.value : [];
+  const posts = postsResult.status === "fulfilled" ? postsResult.value : [];
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, changeFrequency: "weekly", priority: 1 },
