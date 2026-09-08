@@ -18,6 +18,12 @@ const STEPS = [
 export default function PinnedProduct() {
   const ref = useGsapContext<HTMLDivElement>(({ reduced }) => {
     if (reduced) return;
+    // L'effet de scroll épinglé n'a de sens qu'en layout desktop (image collée
+    // pendant que le texte défile) : sur mobile chaque étape a déjà sa propre
+    // image, donc aucun ScrollTrigger n'est nécessaire en dessous de md.
+    const mq = window.matchMedia("(min-width: 768px)");
+    if (!mq.matches) return;
+
     const panels = gsap.utils.toArray<HTMLElement>("[data-pinned-step]");
     const images = gsap.utils.toArray<HTMLElement>("[data-pinned-image]");
     gsap.set(images, { opacity: 0 });
@@ -36,18 +42,33 @@ export default function PinnedProduct() {
 
   return (
     <section ref={ref} className="relative bg-ink px-6 md:px-12">
-      <div className="mx-auto grid max-w-content gap-12 py-20 md:grid-cols-2 md:py-0">
-        <div className="relative order-2 h-[70vh] md:sticky md:top-0 md:order-1 md:flex md:h-screen md:items-center">
+      {/* Mobile / tablette : une carte compacte par étape, image + texte ensemble */}
+      <div className="mx-auto max-w-content space-y-10 py-16 md:hidden">
+        {STEPS.map((step) => (
+          <div key={step.title}>
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl">
+              <Image src={step.img} alt={step.title} fill sizes="90vw" className="object-cover" />
+            </div>
+            <p className="mb-2 mt-6 text-sm text-charge-bright">Puissance &amp; intelligence</p>
+            <h3 className="mb-3 font-display text-display-3 font-light text-paper">{step.title}</h3>
+            <p className="max-w-sm text-paper/70">{step.body}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop : image épinglée pendant que le texte défile */}
+      <div className="mx-auto hidden max-w-content gap-12 py-0 md:grid md:grid-cols-2">
+        <div className="relative order-1 sticky top-0 flex h-screen items-center">
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl">
             {STEPS.map((step, i) => (
               <div key={step.title} data-pinned-image className="absolute inset-0" style={{ opacity: i === 0 ? 1 : 0 }}>
-                <Image src={step.img} alt={step.title} fill sizes="(min-width: 768px) 45vw, 90vw" className="object-cover" />
+                <Image src={step.img} alt={step.title} fill sizes="45vw" className="object-cover" />
               </div>
             ))}
           </div>
         </div>
 
-        <div className="order-1 space-y-[40vh] py-[20vh] md:order-2">
+        <div className="order-2 space-y-[40vh] py-[20vh]">
           {STEPS.map((step) => (
             <div key={step.title} data-pinned-step className="flex min-h-[30vh] flex-col justify-center">
               <p className="mb-4 text-sm text-charge-bright">Puissance &amp; intelligence</p>
