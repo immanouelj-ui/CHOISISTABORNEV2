@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     description: "La recharge électrique, simplement.",
     url: SITE_URL,
     siteName: "CHOISISTABORNE",
-    images: ["/images/misc/og-cover.webp"],
+    images: [{ url: "/images/misc/og-cover.jpg", width: 1200, height: 630, alt: "Borne de recharge CHOISISTABORNE installée sur un mur en briques" }],
     locale: "fr_FR",
     type: "website",
   },
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CHOISISTABORNE",
     description: "Choisissez la borne qui vous correspond.",
-    images: ["/images/misc/og-cover.webp"],
+    images: ["/images/misc/og-cover.jpg"],
   },
 };
 
@@ -44,7 +44,7 @@ const organizationJsonLd = {
   "@type": "Organization",
   name: "CHOISISTABORNE",
   url: SITE_URL,
-  logo: `${SITE_URL}/images/misc/og-cover.webp`,
+  logo: `${SITE_URL}/images/misc/og-cover.jpg`,
   slogan: "Choisissez votre borne. Nous pouvons aussi l'installer.",
 };
 
