@@ -11,7 +11,7 @@ const STEPS = [
   { title: "7,4 kW", body: "Idéale pour une recharge quotidienne stable, compatible avec toute installation standard.", img: "/images/gallery/pinned-1.webp" },
   { title: "11 kW", body: "Un compromis parfait entre rapidité de charge et simplicité d'installation triphasée.", img: "/images/gallery/pinned-2.webp" },
   { title: "22 kW", body: "La puissance maximale autorisée en résidentiel, pour une pleine charge en quelques heures.", img: "/images/gallery/pinned-3.webp" },
-  { title: "Connectée", body: "Suivi de consommation, programmation à distance et mises à jour automatiques.", img: "/images/gallery/pinned-4.webp" },
+  { title: "Connectée", body: "Suivi de consommation, programmation à distance et mises à jour automatiques.", img: "/images/products/circontrol-wallbox-main.webp" },
   { title: "Intelligente", body: "Priorise votre production solaire et s'adapte à votre tarif d'électricité en temps réel.", img: "/images/gallery/pinned-5.webp" },
 ];
 

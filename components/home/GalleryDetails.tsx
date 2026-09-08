@@ -12,7 +12,7 @@ const ITEMS = [
   { src: "/images/gallery/detail-connector.webp", alt: "Connecteur Type 2", label: "Connecteur", span: "md:col-span-2", x: 30, rotate: 2 },
   { src: "/images/gallery/detail-led.webp", alt: "Bandeau LED de statut", label: "LED de statut", span: "md:col-span-2", x: -20, rotate: 1.5 },
   { src: "/images/gallery/detail-texture.webp", alt: "Texture du boîtier", label: "Texture", span: "md:col-span-3", x: 40, rotate: -1.5 },
-  { src: "/images/gallery/detail-install.webp", alt: "Borne installée sur une maison", label: "Installation", span: "md:col-span-5 md:row-span-2", x: 0, rotate: 0 },
+  { src: "/images/products/chargepoint-home-flex-installation.webp", alt: "Borne installée dans un garage", label: "Installation", span: "md:col-span-5 md:row-span-2", x: 0, rotate: 0 },
 ];
 
 export default function GalleryDetails() {

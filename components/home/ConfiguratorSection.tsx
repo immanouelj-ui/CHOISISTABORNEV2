@@ -33,7 +33,7 @@ export default function ConfiguratorSection() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const imgWrapRef = useRef<HTMLDivElement>(null);
 
-  const currentImage = IMAGE_BY_POWER[answers.power] ?? "/images/misc/configurator-1.webp";
+  const currentImage = IMAGE_BY_POWER[answers.power] ?? "/images/misc/configurator-2.webp";
 
   const select = (key: string, value: string) => {
     if (answers[key] === value) return;

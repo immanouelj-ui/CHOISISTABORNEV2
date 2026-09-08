@@ -10,46 +10,79 @@ gsap.registerPlugin(ScrollTrigger);
 export default function ZoomImageSection() {
   const ref = useGsapContext<HTMLDivElement>(({ reduced }) => {
     if (reduced) return;
-    gsap.fromTo(
-      "[data-zoom-img]",
-      { scale: 0.55, borderRadius: "2.5rem" },
-      {
-        scale: 1.3,
-        borderRadius: "0rem",
-        ease: "none",
+
+    // Le "pin" GSAP (scroll-jacking, section figée pendant 1,6x sa hauteur)
+    // est fragile sur mobile : la barre d'adresse de Safari/Chrome qui
+    // apparaît/disparaît en scrollant modifie la hauteur de la fenêtre en
+    // cours d'animation, ce qui provoque des sauts. On réserve donc cet
+    // effet au desktop et on garde une simple apparition en fondu sur mobile.
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+
+    if (isDesktop) {
+      gsap.fromTo(
+        "[data-zoom-img]",
+        { scale: 0.55, borderRadius: "2.5rem" },
+        {
+          scale: 1.3,
+          borderRadius: "0rem",
+          ease: "none",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top top",
+            end: "+=160%",
+            scrub: true,
+            pin: true,
+            invalidateOnRefresh: true,
+          },
+        },
+      );
+      gsap.fromTo(
+        "[data-zoom-caption]",
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top top",
+            end: "+=40%",
+            scrub: true,
+          },
+        },
+      );
+      gsap.to("[data-zoom-caption]", {
+        opacity: 0,
+        y: -30,
         scrollTrigger: {
           trigger: ref.current,
-          start: "top top",
+          start: "+=100%",
           end: "+=160%",
           scrub: true,
-          pin: true,
         },
-      },
-    );
-    gsap.fromTo(
-      "[data-zoom-caption]",
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1,
-        y: 0,
-        scrollTrigger: {
-          trigger: ref.current,
-          start: "top top",
-          end: "+=40%",
-          scrub: true,
+      });
+    } else {
+      gsap.fromTo(
+        "[data-zoom-img]",
+        { scale: 1.1 },
+        {
+          scale: 1,
+          ease: "power2.out",
+          duration: 1,
+          scrollTrigger: { trigger: ref.current, start: "top 70%" },
         },
-      },
-    );
-    gsap.to("[data-zoom-caption]", {
-      opacity: 0,
-      y: -30,
-      scrollTrigger: {
-        trigger: ref.current,
-        start: "+=100%",
-        end: "+=160%",
-        scrub: true,
-      },
-    });
+      );
+      gsap.fromTo(
+        "[data-zoom-caption]",
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: { trigger: ref.current, start: "top 60%" },
+        },
+      );
+    }
   }, []);
 
   return (
