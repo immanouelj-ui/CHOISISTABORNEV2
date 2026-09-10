@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { createStripeCheckoutSession } from "@/lib/stripe";
+import { createStripePaymentIntent } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -123,20 +123,11 @@ export async function POST(request: Request) {
     });
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
-      const session = await createStripeCheckoutSession({
+      const paymentIntent = await createStripePaymentIntent({
         orderId: order.id,
         orderNumber: order.orderNumber,
         customerEmail: email,
-        totalCents: Math.round(subtotalTTC * 100),
-        successUrl: `${baseUrl}/paiement/succes?session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrl: `${baseUrl}/paiement/annule?order=${encodeURIComponent(order.orderNumber)}`,
-        items: orderItems.map((item) => ({
-          name: item.productName,
-          unitAmount: Math.round(item.unitPriceTTC * 100),
-          quantity: item.quantity,
-          image: item.image,
-        })),
+        amountCents: Math.round(subtotalTTC * 100),
       });
 
       await prisma.payment.create({
@@ -144,17 +135,21 @@ export async function POST(request: Request) {
           id: crypto.randomUUID(),
           orderId: order.id,
           provider: "STRIPE",
-          transactionId: session.id,
+          transactionId: paymentIntent.id,
           amount: subtotalTTC,
           currency: "EUR",
           status: "PENDING",
-          paymentMethod: "CHECKOUT",
+          paymentMethod: "CARD",
           createdAt: now,
           updatedAt: new Date(),
         },
       });
 
-      return NextResponse.json({ checkoutUrl: session.url, orderNumber: order.orderNumber });
+      return NextResponse.json({
+        clientSecret: paymentIntent.client_secret,
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+      });
     } catch (stripeError) {
       await prisma.order.delete({ where: { id: order.id } }).catch(() => undefined);
       throw stripeError;

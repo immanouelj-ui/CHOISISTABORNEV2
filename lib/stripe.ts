@@ -6,47 +6,21 @@ function getStripeSecretKey() {
   return key;
 }
 
-export type StripeCheckoutItem = {
-  name: string;
-  description?: string;
-  image?: string;
-  unitAmount: number;
-  quantity: number;
-};
-
-export async function createStripeCheckoutSession(input: {
+export async function createStripePaymentIntent(input: {
   orderId: string;
   orderNumber: string;
   customerEmail: string;
-  items: StripeCheckoutItem[];
-  totalCents: number;
-  successUrl: string;
-  cancelUrl: string;
+  amountCents: number;
 }) {
   const params = new URLSearchParams();
-  params.set("mode", "payment");
-  params.set("customer_email", input.customerEmail);
-  params.set("success_url", input.successUrl);
-  params.set("cancel_url", input.cancelUrl);
+  params.set("amount", String(input.amountCents));
+  params.set("currency", "eur");
+  params.set("receipt_email", input.customerEmail);
+  params.set("automatic_payment_methods[enabled]", "true");
   params.set("metadata[orderId]", input.orderId);
   params.set("metadata[orderNumber]", input.orderNumber);
-  params.set("payment_intent_data[metadata][orderId]", input.orderId);
-  params.set("payment_intent_data[metadata][orderNumber]", input.orderNumber);
 
-  input.items.forEach((item, index) => {
-    params.set(`line_items[${index}][price_data][currency]`, "eur");
-    params.set(`line_items[${index}][price_data][unit_amount]`, String(item.unitAmount));
-    params.set(`line_items[${index}][price_data][product_data][name]`, item.name);
-    if (item.description) {
-      params.set(`line_items[${index}][price_data][product_data][description]`, item.description.slice(0, 500));
-    }
-    if (item.image && /^https?:\/\//.test(item.image)) {
-      params.set(`line_items[${index}][price_data][product_data][images][0]`, item.image);
-    }
-    params.set(`line_items[${index}][quantity]`, String(item.quantity));
-  });
-
-  const response = await fetch(`${STRIPE_API}/checkout/sessions`, {
+  const response = await fetch(`${STRIPE_API}/payment_intents`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${getStripeSecretKey()}`,
@@ -58,19 +32,19 @@ export async function createStripeCheckoutSession(input: {
 
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data?.error?.message || "Stripe checkout session creation failed");
+    throw new Error(data?.error?.message || "Stripe payment intent creation failed");
   }
 
-  return data as { id: string; url: string };
+  return data as { id: string; client_secret: string };
 }
 
-export async function retrieveStripeCheckoutSession(sessionId: string) {
-  const response = await fetch(`${STRIPE_API}/checkout/sessions/${encodeURIComponent(sessionId)}`, {
+export async function retrieveStripePaymentIntent(paymentIntentId: string) {
+  const response = await fetch(`${STRIPE_API}/payment_intents/${encodeURIComponent(paymentIntentId)}`, {
     headers: { Authorization: `Bearer ${getStripeSecretKey()}` },
     cache: "no-store",
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data?.error?.message || "Stripe session retrieval failed");
+  if (!response.ok) throw new Error(data?.error?.message || "Stripe payment intent retrieval failed");
   return data;
 }
 

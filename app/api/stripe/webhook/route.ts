@@ -19,21 +19,18 @@ export async function POST(request: Request) {
     }
 
     const event = JSON.parse(payload) as { type: string; data?: { object?: any } };
-    const session = event.data?.object;
-    const orderId = session?.metadata?.orderId as string | undefined;
+    const paymentIntent = event.data?.object;
+    const orderId = paymentIntent?.metadata?.orderId as string | undefined;
 
     if (!orderId) return NextResponse.json({ received: true });
 
-    if (
-      event.type === "checkout.session.completed" ||
-      event.type === "checkout.session.async_payment_succeeded"
-    ) {
+    if (event.type === "payment_intent.succeeded") {
       await prisma.$transaction(async (tx) => {
         // Atomic claim prevents two Stripe deliveries from decrementing stock twice.
         const paymentClaim = await tx.payment.updateMany({
           where: {
             orderId,
-            transactionId: session?.id,
+            transactionId: paymentIntent?.id,
             status: "PENDING",
           },
           data: { status: "PROCESSING", updatedAt: new Date() },
@@ -63,20 +60,17 @@ export async function POST(request: Request) {
           data: { status: "PAID", paymentStatus: "PAID", updatedAt: now },
         });
         await tx.payment.updateMany({
-          where: { orderId: order.id, transactionId: session.id },
+          where: { orderId: order.id, transactionId: paymentIntent.id },
           data: {
             status: "PAID",
-            paymentMethod: session.payment_method_types?.[0] || "CARD",
+            paymentMethod: paymentIntent.payment_method_types?.[0] || "CARD",
             updatedAt: now,
           },
         });
       });
     }
 
-    if (
-      event.type === "checkout.session.expired" ||
-      event.type === "payment_intent.payment_failed"
-    ) {
+    if (event.type === "payment_intent.payment_failed") {
       const now = new Date();
       await prisma.$transaction([
         prisma.order.updateMany({
