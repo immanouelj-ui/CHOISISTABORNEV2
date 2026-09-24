@@ -7,6 +7,7 @@ import type { ProductDTO } from "@/lib/types";
 import { formatPrice } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { useCartStore } from "@/lib/cart-store";
+import PaymentBadges from "@/components/checkout/PaymentBadges";
 
 export default function ProductReveal({ product }: { product: ProductDTO }) {
   const main = product.images.find((i) => i.kind === "main") ?? product.images[0];
@@ -73,6 +74,7 @@ export default function ProductReveal({ product }: { product: ProductDTO }) {
           <span className="text-sm text-paper/60">{product.powerKw} kW</span>
           <Button onClick={addToCart} size="lg">Choisir cette borne</Button>
         </div>
+        <PaymentBadges className="mt-4" />
       </div>
     </section>
   );
