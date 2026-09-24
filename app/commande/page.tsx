@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCartStore, cartTotal } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/types";
 import PaymentForm from "@/components/checkout/PaymentForm";
+import PaymentBadges from "@/components/checkout/PaymentBadges";
 
 export default function CommandePage() {
   const lines = useCartStore((s) => s.lines);
@@ -79,7 +80,8 @@ export default function CommandePage() {
 
           <div className="grid gap-12 lg:grid-cols-[1fr_360px]">
             <section className="rounded-3xl border border-line p-7 md:p-9">
-              <h2 className="mb-6 font-display text-2xl">Carte bancaire</h2>
+              <h2 className="mb-3 font-display text-2xl">Paiement</h2>
+              <PaymentBadges className="mb-6" />
               <PaymentForm clientSecret={payment.clientSecret} total={payment.total} orderNumber={payment.orderNumber} />
             </section>
 

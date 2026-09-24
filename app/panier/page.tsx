@@ -7,6 +7,7 @@ import { useCartStore, cartTotal } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/types";
 import { ButtonLink } from "@/components/ui/Button";
 import CartInstallCrossSell from "@/components/installation/CartInstallCrossSell";
+import PaymentBadges from "@/components/checkout/PaymentBadges";
 
 export default function PanierPage() {
   const lines = useCartStore((s) => s.lines);
@@ -61,7 +62,7 @@ export default function PanierPage() {
               <div className="mb-6 flex justify-between text-sm text-paper/70"><span>Installation</span><span>Sur devis</span></div>
               <div className="mb-8 flex justify-between border-t border-line pt-4 font-display text-lg text-paper"><span>Total</span><span>{formatPrice(total)}</span></div>
               <ButtonLink href="/commande" className="w-full" size="lg">Passer au paiement</ButtonLink>
-              <p className="mt-4 text-center text-xs text-fog">Paiement sécurisé via Stripe</p>
+              <PaymentBadges className="mt-4 justify-center text-center" />
             </div>
           </div>
         )}
