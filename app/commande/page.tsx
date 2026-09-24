@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useCartStore, cartTotal } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/types";
@@ -12,13 +12,19 @@ export default function CommandePage() {
   const [sameBilling, setSameBilling] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({ name: "", email: "", phone: "", shippingAddress: "", billingAddress: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    shippingLine1: "",
+    shippingPostalCode: "",
+    shippingCity: "",
+    billingLine1: "",
+    billingPostalCode: "",
+    billingCity: "",
+  });
   const [payment, setPayment] = useState<{ clientSecret: string; orderNumber: string; total: number } | null>(null);
   const [checkoutLines, setCheckoutLines] = useState<typeof lines>([]);
-
-  useEffect(() => {
-    if (sameBilling) setForm((current) => ({ ...current, billingAddress: current.shippingAddress }));
-  }, [sameBilling, form.shippingAddress]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,6 +37,7 @@ export default function CommandePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          sameBilling,
           items: lines.map((line) => ({ productId: line.productId, quantity: line.quantity })),
         }),
       });
@@ -110,9 +117,19 @@ export default function CommandePage() {
 
             <section className="rounded-3xl border border-line p-7 md:p-9">
               <h2 className="mb-6 font-display text-2xl">Livraison</h2>
-              <label>Adresse de livraison<textarea required rows={4} value={form.shippingAddress} onChange={(e) => update("shippingAddress", e.target.value)} className="checkout-input" /></label>
+              <div className="grid gap-5 md:grid-cols-2">
+                <label className="md:col-span-2">Adresse<input required value={form.shippingLine1} onChange={(e) => update("shippingLine1", e.target.value)} className="checkout-input" /></label>
+                <label>Code postal<input required value={form.shippingPostalCode} onChange={(e) => update("shippingPostalCode", e.target.value)} className="checkout-input" /></label>
+                <label>Ville<input required value={form.shippingCity} onChange={(e) => update("shippingCity", e.target.value)} className="checkout-input" /></label>
+              </div>
               <label className="mt-6 flex items-center gap-3 text-sm text-paper/80"><input type="checkbox" checked={sameBilling} onChange={(e) => setSameBilling(e.target.checked)} /> Adresse de facturation identique</label>
-              {!sameBilling && <label className="mt-6 block">Adresse de facturation<textarea required rows={4} value={form.billingAddress} onChange={(e) => update("billingAddress", e.target.value)} className="checkout-input" /></label>}
+              {!sameBilling && (
+                <div className="mt-6 grid gap-5 md:grid-cols-2">
+                  <label className="md:col-span-2">Adresse de facturation<input required value={form.billingLine1} onChange={(e) => update("billingLine1", e.target.value)} className="checkout-input" /></label>
+                  <label>Code postal<input required value={form.billingPostalCode} onChange={(e) => update("billingPostalCode", e.target.value)} className="checkout-input" /></label>
+                  <label>Ville<input required value={form.billingCity} onChange={(e) => update("billingCity", e.target.value)} className="checkout-input" /></label>
+                </div>
+              )}
             </section>
 
             {error && <div className="rounded-2xl border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-200">{error}</div>}

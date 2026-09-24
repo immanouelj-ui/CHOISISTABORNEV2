@@ -11,6 +11,11 @@ export async function createStripePaymentIntent(input: {
   orderNumber: string;
   customerEmail: string;
   amountCents: number;
+  shipping: {
+    name: string;
+    phone?: string;
+    address: { line1: string; postalCode: string; city: string; country: string };
+  };
 }) {
   const params = new URLSearchParams();
   params.set("amount", String(input.amountCents));
@@ -19,6 +24,14 @@ export async function createStripePaymentIntent(input: {
   params.set("automatic_payment_methods[enabled]", "true");
   params.set("metadata[orderId]", input.orderId);
   params.set("metadata[orderNumber]", input.orderNumber);
+  // Requis par Klarna (et recommandé pour les autres moyens de paiement) pour
+  // déterminer le pays du client et maximiser le taux d'acceptation.
+  params.set("shipping[name]", input.shipping.name);
+  params.set("shipping[address][line1]", input.shipping.address.line1);
+  params.set("shipping[address][postal_code]", input.shipping.address.postalCode);
+  params.set("shipping[address][city]", input.shipping.address.city);
+  params.set("shipping[address][country]", input.shipping.address.country);
+  if (input.shipping.phone) params.set("shipping[phone]", input.shipping.phone);
 
   const response = await fetch(`${STRIPE_API}/payment_intents`, {
     method: "POST",

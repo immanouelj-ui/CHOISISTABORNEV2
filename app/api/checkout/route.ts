@@ -17,15 +17,22 @@ export async function POST(request: Request) {
     const email = clean(body.email).toLowerCase();
     const name = clean(body.name);
     const phone = clean(body.phone) || null;
-    const shippingAddress = clean(body.shippingAddress);
-    const billingAddress = clean(body.billingAddress) || shippingAddress;
+    const shippingLine1 = clean(body.shippingLine1);
+    const shippingPostalCode = clean(body.shippingPostalCode);
+    const shippingCity = clean(body.shippingCity);
+    const shippingAddress = `${shippingLine1}, ${shippingPostalCode} ${shippingCity}, France`;
+    const sameBilling = body.sameBilling !== false;
+    const billingLine1 = sameBilling ? shippingLine1 : clean(body.billingLine1);
+    const billingPostalCode = sameBilling ? shippingPostalCode : clean(body.billingPostalCode);
+    const billingCity = sameBilling ? shippingCity : clean(body.billingCity);
+    const billingAddress = `${billingLine1}, ${billingPostalCode} ${billingCity}, France`;
     const requestedUserId = clean(body.userId) || null;
     const items = Array.isArray(body.items) ? body.items : [];
 
     if (!email || !email.includes("@")) {
       return NextResponse.json({ error: "Adresse e-mail invalide." }, { status: 400 });
     }
-    if (!name || !shippingAddress || items.length === 0) {
+    if (!name || !shippingLine1 || !shippingPostalCode || !shippingCity || items.length === 0) {
       return NextResponse.json({ error: "Informations client ou panier incomplets." }, { status: 400 });
     }
 
@@ -128,6 +135,11 @@ export async function POST(request: Request) {
         orderNumber: order.orderNumber,
         customerEmail: email,
         amountCents: Math.round(subtotalTTC * 100),
+        shipping: {
+          name,
+          phone: phone || undefined,
+          address: { line1: shippingLine1, postalCode: shippingPostalCode, city: shippingCity, country: "FR" },
+        },
       });
 
       await prisma.payment.create({
