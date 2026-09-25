@@ -79,14 +79,8 @@ export default function CommandePage() {
 
         <div className="grid gap-12 lg:grid-cols-[1fr_360px]">
           <div className="space-y-8">
-            {payment ? (
-              <section className="rounded-3xl border border-line p-7 md:p-9">
-                <h2 className="mb-3 font-display text-2xl">Vos informations</h2>
-                <p className="text-sm text-paper/70">{form.name}</p>
-                <p className="text-sm text-paper/70">{form.shippingLine1}, {form.shippingPostalCode} {form.shippingCity}</p>
-              </section>
-            ) : (
-              <form onSubmit={submit} className="space-y-8">
+            <form onSubmit={submit} className="space-y-8">
+              <fieldset disabled={!!payment} className="space-y-8 disabled:opacity-50">
                 <section className="rounded-3xl border border-line p-7 md:p-9">
                   <h2 className="mb-6 font-display text-2xl">Coordonnées</h2>
                   <div className="grid gap-5 md:grid-cols-2">
@@ -112,15 +106,19 @@ export default function CommandePage() {
                     </div>
                   )}
                 </section>
+              </fieldset>
 
-                {error && <div className="rounded-2xl border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-200">{error}</div>}
+              {error && <div className="rounded-2xl border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-200">{error}</div>}
 
-                <button disabled={loading} className="w-full rounded-full bg-paper px-6 py-4 font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50">
-                  {loading ? "Préparation du paiement…" : "Continuer vers le paiement"}
-                </button>
-                <p className="text-center text-xs text-fog">Le paiement par carte se fait directement sur cette page, sans redirection.</p>
-              </form>
-            )}
+              {!payment && (
+                <>
+                  <button disabled={loading} className="w-full rounded-full bg-paper px-6 py-4 font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50">
+                    {loading ? "Préparation du paiement…" : "Continuer vers le paiement"}
+                  </button>
+                  <p className="text-center text-xs text-fog">Le paiement par carte se fait directement sur cette page, sans redirection.</p>
+                </>
+              )}
+            </form>
 
             {payment && (
               <section className="rounded-3xl border border-line p-7 md:p-9">
