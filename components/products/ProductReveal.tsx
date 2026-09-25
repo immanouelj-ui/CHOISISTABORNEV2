@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { useGsapContext } from "@/components/animations/useGsapContext";
 import type { ProductDTO } from "@/lib/types";
@@ -12,6 +13,7 @@ import PaymentBadges from "@/components/checkout/PaymentBadges";
 export default function ProductReveal({ product }: { product: ProductDTO }) {
   const main = product.images.find((i) => i.kind === "main") ?? product.images[0];
   const addItem = useCartStore((s) => s.addItem);
+  const router = useRouter();
 
   const ref = useGsapContext<HTMLDivElement>(({ reduced }) => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -45,6 +47,11 @@ export default function ProductReveal({ product }: { product: ProductDTO }) {
     });
   };
 
+  const buyNow = () => {
+    addToCart();
+    router.push("/commande");
+  };
+
   return (
     <section ref={ref} className="relative flex min-h-[100svh] w-full items-end overflow-hidden bg-ink">
       <div className="absolute inset-0 overflow-hidden">
@@ -72,7 +79,10 @@ export default function ProductReveal({ product }: { product: ProductDTO }) {
         <div data-reveal-meta className="mt-8 flex flex-wrap items-center gap-6">
           <span className="font-display text-2xl text-paper">{formatPrice(product.price)}</span>
           <span className="text-sm text-paper/60">{product.powerKw} kW</span>
-          <Button onClick={addToCart} size="lg">Choisir cette borne</Button>
+        </div>
+        <div data-reveal-meta className="mt-6 flex flex-wrap items-center gap-4">
+          <Button onClick={buyNow} size="lg">Acheter maintenant</Button>
+          <Button onClick={addToCart} variant="secondary" size="lg">Ajouter au panier</Button>
         </div>
         <PaymentBadges className="mt-4" />
       </div>
