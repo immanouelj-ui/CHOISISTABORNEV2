@@ -65,89 +65,78 @@ export default function CommandePage() {
     );
   }
 
-  const total = cartTotal(lines);
   const update = (key: keyof typeof form, value: string) => setForm((current) => ({ ...current, [key]: value }));
-
-  if (payment) {
-    return (
-      <main className="min-h-screen bg-ink px-6 pb-32 pt-40 text-paper md:px-12">
-        <div className="mx-auto max-w-content">
-          <div className="mb-12">
-            <p className="mb-3 text-xs uppercase tracking-[0.2em] text-fog">Commande sécurisée</p>
-            <h1 className="font-display text-display-2 font-light">Paiement</h1>
-            <p className="mt-3 text-paper/60">Commande {payment.orderNumber}</p>
-          </div>
-
-          <div className="grid gap-12 lg:grid-cols-[1fr_360px]">
-            <section className="rounded-3xl border border-line p-7 md:p-9">
-              <h2 className="mb-3 font-display text-2xl">Paiement</h2>
-              <PaymentBadges className="mb-6" />
-              <PaymentForm clientSecret={payment.clientSecret} total={payment.total} orderNumber={payment.orderNumber} />
-            </section>
-
-            <aside className="h-fit rounded-3xl border border-line p-7 lg:sticky lg:top-32">
-              <h2 className="mb-6 font-display text-xl">Récapitulatif</h2>
-              <div className="space-y-4">
-                {checkoutLines.map((line) => <div key={line.productId} className="flex justify-between gap-4 text-sm"><span className="text-paper/70">{line.name} × {line.quantity}</span><span>{formatPrice(line.price * line.quantity)}</span></div>)}
-              </div>
-              <div className="mt-6 flex justify-between border-t border-line pt-5 font-display text-lg"><span>Total</span><span>{formatPrice(payment.total)}</span></div>
-            </aside>
-          </div>
-        </div>
-      </main>
-    );
-  }
+  const recapLines = payment ? checkoutLines : lines;
+  const recapTotal = payment ? payment.total : cartTotal(lines);
 
   return (
     <main className="min-h-screen bg-ink px-6 pb-32 pt-40 text-paper md:px-12">
       <div className="mx-auto max-w-content">
         <div className="mb-12">
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-fog">Commande sécurisée</p>
-          <h1 className="font-display text-display-2 font-light">Vos informations</h1>
+          <h1 className="font-display text-display-2 font-light">Finalisez votre achat</h1>
         </div>
 
         <div className="grid gap-12 lg:grid-cols-[1fr_360px]">
-          <form onSubmit={submit} className="space-y-8">
-            <section className="rounded-3xl border border-line p-7 md:p-9">
-              <h2 className="mb-6 font-display text-2xl">Coordonnées</h2>
-              <div className="grid gap-5 md:grid-cols-2">
-                <label className="md:col-span-2">Nom complet<input required value={form.name} onChange={(e) => update("name", e.target.value)} className="checkout-input" /></label>
-                <label>E-mail<input required type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="checkout-input" /></label>
-                <label>Téléphone<input value={form.phone} onChange={(e) => update("phone", e.target.value)} className="checkout-input" /></label>
-              </div>
-            </section>
+          <div className="space-y-8">
+            {payment ? (
+              <section className="rounded-3xl border border-line p-7 md:p-9">
+                <h2 className="mb-3 font-display text-2xl">Vos informations</h2>
+                <p className="text-sm text-paper/70">{form.name}</p>
+                <p className="text-sm text-paper/70">{form.shippingLine1}, {form.shippingPostalCode} {form.shippingCity}</p>
+              </section>
+            ) : (
+              <form onSubmit={submit} className="space-y-8">
+                <section className="rounded-3xl border border-line p-7 md:p-9">
+                  <h2 className="mb-6 font-display text-2xl">Coordonnées</h2>
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <label className="md:col-span-2">Nom complet<input required value={form.name} onChange={(e) => update("name", e.target.value)} className="checkout-input" /></label>
+                    <label>E-mail<input required type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="checkout-input" /></label>
+                    <label>Téléphone<input value={form.phone} onChange={(e) => update("phone", e.target.value)} className="checkout-input" /></label>
+                  </div>
+                </section>
 
-            <section className="rounded-3xl border border-line p-7 md:p-9">
-              <h2 className="mb-6 font-display text-2xl">Livraison</h2>
-              <div className="grid gap-5 md:grid-cols-2">
-                <label className="md:col-span-2">Adresse<input required value={form.shippingLine1} onChange={(e) => update("shippingLine1", e.target.value)} className="checkout-input" /></label>
-                <label>Code postal<input required value={form.shippingPostalCode} onChange={(e) => update("shippingPostalCode", e.target.value)} className="checkout-input" /></label>
-                <label>Ville<input required value={form.shippingCity} onChange={(e) => update("shippingCity", e.target.value)} className="checkout-input" /></label>
-              </div>
-              <label className="mt-6 flex items-center gap-3 text-sm text-paper/80"><input type="checkbox" checked={sameBilling} onChange={(e) => setSameBilling(e.target.checked)} /> Adresse de facturation identique</label>
-              {!sameBilling && (
-                <div className="mt-6 grid gap-5 md:grid-cols-2">
-                  <label className="md:col-span-2">Adresse de facturation<input required value={form.billingLine1} onChange={(e) => update("billingLine1", e.target.value)} className="checkout-input" /></label>
-                  <label>Code postal<input required value={form.billingPostalCode} onChange={(e) => update("billingPostalCode", e.target.value)} className="checkout-input" /></label>
-                  <label>Ville<input required value={form.billingCity} onChange={(e) => update("billingCity", e.target.value)} className="checkout-input" /></label>
-                </div>
-              )}
-            </section>
+                <section className="rounded-3xl border border-line p-7 md:p-9">
+                  <h2 className="mb-6 font-display text-2xl">Livraison</h2>
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <label className="md:col-span-2">Adresse<input required value={form.shippingLine1} onChange={(e) => update("shippingLine1", e.target.value)} className="checkout-input" /></label>
+                    <label>Code postal<input required value={form.shippingPostalCode} onChange={(e) => update("shippingPostalCode", e.target.value)} className="checkout-input" /></label>
+                    <label>Ville<input required value={form.shippingCity} onChange={(e) => update("shippingCity", e.target.value)} className="checkout-input" /></label>
+                  </div>
+                  <label className="mt-6 flex items-center gap-3 text-sm text-paper/80"><input type="checkbox" checked={sameBilling} onChange={(e) => setSameBilling(e.target.checked)} /> Adresse de facturation identique</label>
+                  {!sameBilling && (
+                    <div className="mt-6 grid gap-5 md:grid-cols-2">
+                      <label className="md:col-span-2">Adresse de facturation<input required value={form.billingLine1} onChange={(e) => update("billingLine1", e.target.value)} className="checkout-input" /></label>
+                      <label>Code postal<input required value={form.billingPostalCode} onChange={(e) => update("billingPostalCode", e.target.value)} className="checkout-input" /></label>
+                      <label>Ville<input required value={form.billingCity} onChange={(e) => update("billingCity", e.target.value)} className="checkout-input" /></label>
+                    </div>
+                  )}
+                </section>
 
-            {error && <div className="rounded-2xl border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-200">{error}</div>}
+                {error && <div className="rounded-2xl border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-200">{error}</div>}
 
-            <button disabled={loading} className="w-full rounded-full bg-paper px-6 py-4 font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50">
-              {loading ? "Préparation du paiement…" : "Continuer vers le paiement"}
-            </button>
-            <p className="text-center text-xs text-fog">Le paiement par carte se fait directement sur cette page, sans redirection.</p>
-          </form>
+                <button disabled={loading} className="w-full rounded-full bg-paper px-6 py-4 font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50">
+                  {loading ? "Préparation du paiement…" : "Continuer vers le paiement"}
+                </button>
+                <p className="text-center text-xs text-fog">Le paiement par carte se fait directement sur cette page, sans redirection.</p>
+              </form>
+            )}
+
+            {payment && (
+              <section className="rounded-3xl border border-line p-7 md:p-9">
+                <h2 className="mb-3 font-display text-2xl">Paiement</h2>
+                <PaymentBadges className="mb-6" />
+                <PaymentForm clientSecret={payment.clientSecret} total={payment.total} orderNumber={payment.orderNumber} />
+              </section>
+            )}
+          </div>
 
           <aside className="h-fit rounded-3xl border border-line p-7 lg:sticky lg:top-32">
             <h2 className="mb-6 font-display text-xl">Récapitulatif</h2>
             <div className="space-y-4">
-              {lines.map((line) => <div key={line.productId} className="flex justify-between gap-4 text-sm"><span className="text-paper/70">{line.name} × {line.quantity}</span><span>{formatPrice(line.price * line.quantity)}</span></div>)}
+              {recapLines.map((line) => <div key={line.productId} className="flex justify-between gap-4 text-sm"><span className="text-paper/70">{line.name} × {line.quantity}</span><span>{formatPrice(line.price * line.quantity)}</span></div>)}
             </div>
-            <div className="mt-6 flex justify-between border-t border-line pt-5 font-display text-lg"><span>Total</span><span>{formatPrice(total)}</span></div>
+            <div className="mt-6 flex justify-between border-t border-line pt-5 font-display text-lg"><span>Total</span><span>{formatPrice(recapTotal)}</span></div>
           </aside>
         </div>
       </div>
