@@ -27,6 +27,10 @@ export default function AccountForm() {
       setError("La connexion Google a échoué pendant le retour vers le site. Vérifiez les URL de redirection Supabase.");
     } else if (authError === "missing_code") {
       setError("La connexion Google est incomplète. Veuillez réessayer.");
+    } else if (authError === "apple_auth") {
+      setError("La connexion Apple n'a pas pu être finalisée. Vérifiez la configuration Apple/Supabase.");
+    } else if (authError === "apple_config") {
+      setError("La connexion Apple n'est pas encore configurée sur le serveur. Ajoutez les variables Supabase dans Vercel.");
     }
 
     fetch("/api/auth/me", { cache: "no-store" })
@@ -123,6 +127,16 @@ export default function AccountForm() {
           <path fill="#EA4335" d="M12 6.26c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.36 14.63 2.4 12 2.4a9.75 9.75 0 0 0-8.71 5.38l3.24 2.51C7.3 7.98 9.46 6.26 12 6.26Z" />
         </svg>
         Continuer avec Google
+      </a>
+
+      <a
+        href="/api/auth/apple"
+        className="mt-3 flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-black/80"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
+          <path d="M16.365 1.43c0 1.14-.437 2.09-1.312 2.85-.938.828-2.02 1.26-3.107 1.17-.15-1.11.423-2.28 1.276-3.04.86-.78 2.11-1.28 3.143-1.35v.37Zm3.51 16.46c-.53 1.22-.78 1.76-1.46 2.83-.95 1.5-2.29 3.37-3.95 3.39-1.48.02-1.86-.96-3.87-.95-2.01.01-2.43.97-3.91.95-1.66-.02-2.93-1.7-3.88-3.2C.5 17.46-.42 12.67 1.6 9.44c1-1.6 2.79-2.62 4.73-2.64 1.53-.02 2.98 1.03 3.92 1.03.93 0 2.69-1.28 4.53-1.09.77.03 2.94.31 4.33 2.35-.11.07-2.58 1.51-2.55 4.5.03 3.59 3.15 4.79 3.19 4.81-.03.09-.5 1.72-1.65 3.44Z" />
+        </svg>
+        Continuer avec Apple
       </a>
 
       <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-[0.15em] text-paper/30">
