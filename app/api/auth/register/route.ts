@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { sendWelcomeEmail } from "@/lib/email";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -69,6 +70,8 @@ export async function POST(request: Request) {
         updatedAt: new Date(),
       },
     });
+
+    void sendWelcomeEmail({ to: authData.user.email ?? data.email.toLowerCase(), name: data.name });
 
     const response = NextResponse.json({
       user: { id: authData.user.id, email: authData.user.email, name: data.name },
