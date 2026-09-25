@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
   try {
     const cookieStore = await cookies();
-    const response = NextResponse.redirect(new URL("/", request.url));
+    const response = NextResponse.redirect(new URL("/compte", request.url));
 
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
