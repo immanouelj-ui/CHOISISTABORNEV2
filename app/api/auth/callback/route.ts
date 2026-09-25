@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -49,6 +50,7 @@ export async function GET(request: Request) {
     const email = data.user.email ?? "";
 
     if (email) {
+      const existingUser = await prisma.user.findUnique({ where: { id: data.user.id } });
       await prisma.user.upsert({
         where: { id: data.user.id },
         create: {
@@ -64,6 +66,9 @@ export async function GET(request: Request) {
           updatedAt: new Date(),
         },
       });
+      if (!existingUser) {
+        void sendWelcomeEmail({ to: email, name });
+      }
     }
 
     return response;
