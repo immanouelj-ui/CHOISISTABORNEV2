@@ -24,8 +24,11 @@ function welcomeEmailHtml(name: string) {
         </a>
       </p>
       <p style="font-size: 13px; color: #6b7280; line-height: 1.6;">
-        Une question sur l'installation ou le choix de votre borne ? Répondez simplement à cet e-mail,
-        notre équipe vous répond directement.
+        Une question sur l'installation ou le choix de votre borne ?
+        <a href="https://www.choisistaborne.fr/contact" style="color: #121418;">Contactez-nous</a> depuis le site.
+      </p>
+      <p style="margin-top: 24px; font-size: 11px; color: #9ca3af; line-height: 1.5;">
+        Cet e-mail est envoyé automatiquement, merci de ne pas y répondre directement.
       </p>
     </div>
   `;
