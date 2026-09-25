@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { pushLeadToCrm } from "@/lib/crm";
+import { sendQuoteRequestConfirmationEmail } from "@/lib/email";
 
 export { LEAD_STATUSES, LEAD_STATUS_LABELS } from "@/lib/lead-status";
 export type { LeadStatus } from "@/lib/lead-status";
@@ -63,6 +64,12 @@ export async function createInstallationRequest(input: CreateLeadInput) {
     input.productName ? `Produit souhaité : ${input.productName}` : undefined,
     input.hasBornAlready ? "Possède déjà sa borne, cherche uniquement l'installation." : undefined,
   ].filter(Boolean);
+
+  void sendQuoteRequestConfirmationEmail({
+    to: input.email,
+    firstName: input.firstName,
+    productName: input.productName,
+  });
 
   await pushLeadToCrm({
     prenom: input.firstName,
