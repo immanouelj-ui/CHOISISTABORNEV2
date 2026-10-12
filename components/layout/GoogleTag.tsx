@@ -1,42 +1,40 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Script from "next/script";
+import { useEffect } from "react";
 
 const STORAGE_KEY = "ctb-cookie-consent";
 export const CONSENT_EVENT = "ctb-cookie-consent-change";
-const TAG_ID = "AW-18509034830";
 
-// Charge le tag Google uniquement après acceptation des cookies de mesure d'audience.
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+// Le tag Google est chargé dans le layout avec le consentement refusé par défaut
+// (Consent Mode v2). Ce composant passe le consentement à "granted" après acceptation.
 export default function GoogleTag() {
-  const [allowed, setAllowed] = useState(false);
-
   useEffect(() => {
-    const read = () => {
+    const sync = () => {
+      let accepted = false;
       try {
-        setAllowed(localStorage.getItem(STORAGE_KEY) === "accepted");
+        accepted = localStorage.getItem(STORAGE_KEY) === "accepted";
       } catch {
-        setAllowed(false);
+        accepted = false;
+      }
+      if (accepted && typeof window.gtag === "function") {
+        window.gtag("consent", "update", {
+          ad_storage: "granted",
+          ad_user_data: "granted",
+          ad_personalization: "granted",
+          analytics_storage: "granted",
+        });
       }
     };
-    read();
-    window.addEventListener(CONSENT_EVENT, read);
-    return () => window.removeEventListener(CONSENT_EVENT, read);
+    sync();
+    window.addEventListener(CONSENT_EVENT, sync);
+    return () => window.removeEventListener(CONSENT_EVENT, sync);
   }, []);
 
-  if (!allowed) return null;
-
-  return (
-    <>
-      <Script src={`https://www.googletagmanager.com/gtag/js?id=${TAG_ID}`} strategy="afterInteractive" />
-      <Script id="google-tag" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${TAG_ID}');
-        `}
-      </Script>
-    </>
-  );
+  return null;
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import AnimatedHeader from "@/components/layout/AnimatedHeader";
 import Footer from "@/components/layout/Footer";
@@ -59,6 +60,24 @@ const websiteJsonLd = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
+      <head>
+        {/* Google tag (gtag.js) — consentement refusé par défaut, accordé via GoogleTag après acceptation */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=AW-18509034830" strategy="beforeInteractive" />
+        <Script id="google-tag" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied'
+            });
+            gtag('js', new Date());
+            gtag('config', 'AW-18509034830');
+          `}
+        </Script>
+      </head>
       <body className="antialiased font-body">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
