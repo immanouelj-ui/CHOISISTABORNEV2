@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import AnimatedHeader from "@/components/layout/AnimatedHeader";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/layout/CartDrawer";
 import CookieConsent from "@/components/layout/CookieConsent";
+import GoogleTag from "@/components/layout/GoogleTag";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -59,18 +59,6 @@ const websiteJsonLd = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <head>
-        {/* Google tag (gtag.js) */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=AW-18509034830" strategy="afterInteractive" />
-        <Script id="google-tag" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'AW-18509034830');
-          `}
-        </Script>
-      </head>
       <body className="antialiased font-body">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
@@ -79,6 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <CartDrawer />
         <CookieConsent />
+        <GoogleTag />
       </body>
     </html>
   );

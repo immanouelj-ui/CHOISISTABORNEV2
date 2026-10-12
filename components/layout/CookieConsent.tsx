@@ -23,6 +23,7 @@ export default function CookieConsent() {
     } catch {
       // navigation privée ou stockage bloqué : on masque simplement le bandeau
     }
+    window.dispatchEvent(new Event("ctb-cookie-consent-change"));
     setVisible(false);
   }
 
